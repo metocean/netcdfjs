@@ -1,0 +1,21 @@
+{
+  "name": "netcdf",
+  "version": "0.1.0",
+  "description": "Read NetCDF files in the browser or with Node.js",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:metocean/netcdfjs.git"
+  },
+  "main": "index.js",
+  "author": "Thomas Coats",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/metocean/netcdfjs/issues"
+  },
+  "readmeFilename": "README.md",
+  "homepage": "https://github.com/metocean/netcdfjs",
+  "dependencies": {
+    "text-encoding": "^0.5.2",
+    "typedarray": "0.0.6"
+  }
+}
