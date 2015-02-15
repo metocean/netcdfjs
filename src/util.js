@@ -6,59 +6,64 @@ TextDecoder = require('text-encoding').TextDecoder;
 decoder = new TextDecoder('utf-8');
 
 test = {
+  is4Byte: (function(_this) {
+    return function(data, bytes) {
+      return data[0] === bytes[0] && data[1] === bytes[1] && data[2] === bytes[2] && data[3] === bytes[3];
+    };
+  })(this),
   isFFFFFFFF: (function(_this) {
     return function(data) {
-      return data[0] === 255 && data[1] === 255 && data[2] === 255 && data[3] === 255;
+      return test.is4Byte(data, [255, 255, 255, 255]);
     };
   })(this),
   isZero: (function(_this) {
     return function(data) {
-      return data[0] === 0 && data[1] === 0 && data[2] === 0 && data[3] === 0;
+      return test.is4Byte(data, [0, 0, 0, 0]);
     };
   })(this),
   isDimension: (function(_this) {
     return function(data) {
-      return data[0] === 0 && data[1] === 0 && data[2] === 0 && data[3] === 10;
+      return test.is4Byte(data, [0, 0, 0, 10]);
     };
   })(this),
   isVariable: (function(_this) {
     return function(data) {
-      return data[0] === 0 && data[1] === 0 && data[2] === 0 && data[3] === 11;
+      return test.is4Byte(data, [0, 0, 0, 11]);
     };
   })(this),
   isAttribute: (function(_this) {
     return function(data) {
-      return data[0] === 0 && data[1] === 0 && data[2] === 0 && data[3] === 12;
+      return test.is4Byte(data, [0, 0, 0, 12]);
     };
   })(this),
   isByte: (function(_this) {
     return function(data) {
-      return data[0] === 0 && data[1] === 0 && data[2] === 0 && data[3] === 1;
+      return test.is4Byte(data, [0, 0, 0, 1]);
     };
   })(this),
   isChar: (function(_this) {
     return function(data) {
-      return data[0] === 0 && data[1] === 0 && data[2] === 0 && data[3] === 2;
+      return test.is4Byte(data, [0, 0, 0, 2]);
     };
   })(this),
   isShort: (function(_this) {
     return function(data) {
-      return data[0] === 0 && data[1] === 0 && data[2] === 0 && data[3] === 3;
+      return test.is4Byte(data, [0, 0, 0, 3]);
     };
   })(this),
   isInt: (function(_this) {
     return function(data) {
-      return data[0] === 0 && data[1] === 0 && data[2] === 0 && data[3] === 4;
+      return test.is4Byte(data, [0, 0, 0, 4]);
     };
   })(this),
   isFloat: (function(_this) {
     return function(data) {
-      return data[0] === 0 && data[1] === 0 && data[2] === 0 && data[3] === 5;
+      return test.is4Byte(data, [0, 0, 0, 5]);
     };
   })(this),
   isDouble: (function(_this) {
     return function(data) {
-      return data[0] === 0 && data[1] === 0 && data[2] === 0 && data[3] === 6;
+      return test.is4Byte(data, [0, 0, 0, 6]);
     };
   })(this)
 };
@@ -90,16 +95,24 @@ convert = {
     };
   })(this),
   shorts: (function(_this) {
-    return function(data) {};
+    return function(data) {
+      return data;
+    };
   })(this),
   ints: (function(_this) {
-    return function(data) {};
+    return function(data) {
+      return data;
+    };
   })(this),
   floats: (function(_this) {
-    return function(data) {};
+    return function(data) {
+      return data;
+    };
   })(this),
   doubles: (function(_this) {
-    return function(data) {};
+    return function(data) {
+      return data;
+    };
   })(this),
   type: (function(_this) {
     return function(data) {

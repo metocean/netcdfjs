@@ -1,20 +1,9 @@
 Lexer = require './lexer'
 util = require './util'
 
-class Parser
+class Header
   constructor: (data) ->
     @lex = new Lexer data
-  
-  info: (msg) => console.log msg
-  fin: =>
-    return no if @lex.hasMore()
-    yes
-  
-  parse: =>
-    header = @header()
-    data = @data header
-    header: header
-    data: data
   
   header: =>
     version: @magic()
@@ -32,10 +21,9 @@ class Parser
       return @error "I don't know how to read NetCDF version #{version}"
     description = 'Classic format' if version is 1
     description = '64 bit offset format' if version is 2
-    description = 'Version 3 - Unknown' if version is 3
     number: version
     description: description
-    
+  
   numrecs: =>
     numrecs = @lex.bytes 4
     if util.test.isFFFFFFFF numrecs
@@ -91,6 +79,7 @@ class Parser
     name: name
     value: value
   
+  # ABSENT | NC_VARIABLE   nelems  [var ...]
   var_list: =>
     id = @lex.bytes 4
     return null if util.test.isZero id
@@ -107,7 +96,6 @@ class Parser
   var: =>
     name = @name()
     num = @lex.uint32()
-    
     name: name
     value:
       dimensions: [1..num].map => @lex.uint32()
@@ -115,11 +103,5 @@ class Parser
       type: util.convert.type @lex.bytes 4
       size: @lex.uint32()
       offset: @lex.uint32()
-  
-  data: (header) =>
-    {}
 
-module.exports =
-  parse: (data) -> new Parser(data).parse()
-  header: (data) -> new Parser(data).header()
-  data: (header, data) -> new Parser(data).data header
+module.exports = (data) -> new Header(data).header()

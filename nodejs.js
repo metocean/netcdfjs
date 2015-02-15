@@ -13,6 +13,6 @@ data = new Uint8Array(buf);
 
 header = netcdf.header(data);
 
-content = netcdf.data(header, data);
+content = netcdf.body(data, header, 2);
 
 console.log(JSON.stringify(content, null, 2));

@@ -1,6 +1,6 @@
-{ parse, header, data } = require './src/parse'
+header = require './src/header'
+body = require './src/body'
 
 module.exports =
-  parse: parse
   header: header
-  data: data
+  body: body
