@@ -39,7 +39,7 @@ Header = (function() {
     }
     version = this.lex.byte();
     if (version !== 1 && version !== 2 && version !== 3) {
-      throw new Error("I don't know how to read NetCDF version " + version);
+      throw new Error("Unknown NetCDF format (version " + version + ")");
     }
     if (version === 1) {
       description = 'Classic format';
@@ -81,7 +81,7 @@ Header = (function() {
     this.lex.forward(constants.dimensionMarker.length);
     return (function() {
       _results = [];
-      for (var _i = 1, _ref = this.lex.uint32(); 1 <= _ref ? _i <= _ref : _i >= _ref; 1 <= _ref ? _i++ : _i--){ _results.push(_i); }
+      for (var _i = 0, _ref = this.lex.uint32(); 0 <= _ref ? _i < _ref : _i > _ref; 0 <= _ref ? _i++ : _i--){ _results.push(_i); }
       return _results;
     }).apply(this).map((function(_this) {
       return function() {
@@ -121,7 +121,7 @@ Header = (function() {
     }
     this.lex.forward(constants.attributeMarker.length);
     res = {};
-    for (_i = 1, _ref = this.lex.uint32(); 1 <= _ref ? _i <= _ref : _i >= _ref; 1 <= _ref ? _i++ : _i--) {
+    for (_i = 0, _ref = this.lex.uint32(); 0 <= _ref ? _i < _ref : _i > _ref; 0 <= _ref ? _i++ : _i--) {
       attr = this.attr();
       res[attr.name] = attr.value;
     }
@@ -146,7 +146,7 @@ Header = (function() {
     }
     this.lex.forward(constants.variableMarker.length);
     res = {};
-    for (_i = 1, _ref = this.lex.uint32(); 1 <= _ref ? _i <= _ref : _i >= _ref; 1 <= _ref ? _i++ : _i--) {
+    for (_i = 0, _ref = this.lex.uint32(); 0 <= _ref ? _i < _ref : _i > _ref; 0 <= _ref ? _i++ : _i--) {
       variable = this["var"]();
       res[variable.name] = variable.value;
     }
@@ -160,7 +160,7 @@ Header = (function() {
       value: {
         dimensions: (function() {
           _results = [];
-          for (var _i = 1, _ref = this.lex.uint32(); 1 <= _ref ? _i <= _ref : _i >= _ref; 1 <= _ref ? _i++ : _i--){ _results.push(_i); }
+          for (var _i = 0, _ref = this.lex.uint32(); 0 <= _ref ? _i < _ref : _i > _ref; 0 <= _ref ? _i++ : _i--){ _results.push(_i); }
           return _results;
         }).apply(this).map((function(_this) {
           return function() {

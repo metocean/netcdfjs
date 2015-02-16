@@ -1,10 +1,9 @@
-{ TextDecoder } = require 'text-encoding'
-decoder = new TextDecoder 'utf-8'
+decoder = new require('text-encoding').TextDecoder 'utf-8'
 constants = require './constants'
 
 match = (data, index, bytes) ->
   return no if index + bytes.length > data.length
-  for i in [0..bytes.length - 1]
+  for i in [0...bytes.length]
     return no if bytes[i] isnt data[index + i]
   yes
 
@@ -63,10 +62,8 @@ module.exports = class Lexer
     # TODO: find out the best way to handle 64 bit ints in javascript
     @forward 8
     @d[@i-4] << 24 | @d[@i-3] << 16 | @d[@i-2] << 8 | @d[@i-1]
-  float: =>
-    throw new Error 'Not implemented'
-  double: =>
-    throw new Error 'Not implemented'
+  float: => throw new Error 'Not implemented'
+  double: => throw new Error 'Not implemented'
   type: =>
     @forward 4
     rmatch = (bytes) => match @d, @i-4, bytes
@@ -83,14 +80,14 @@ module.exports = class Lexer
     @fill n
     result
   bytes: (n) =>
-    result = [1..n].map => @byte()
+    result = [0...n].map => @byte()
     @fill n
     result
   shorts: (n) =>
-    result = [1..n].map => @uint16()
+    result = [0...n].map => @uint16()
     @fill n * 2
     result
-  ints: (n) => [1..n].map => @uint32()
-  floats: (n) => [1..n].map => @float()
-  doubles: (n) => [1..n].map => @double()
+  ints: (n) => [0...n].map => @uint32()
+  floats: (n) => [0...n].map => @float()
+  doubles: (n) => [0...n].map => @double()
   reader: (type) => @["#{type}s"]

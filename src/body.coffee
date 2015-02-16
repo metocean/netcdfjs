@@ -24,7 +24,7 @@ class Body
     return @lex.byte() if dimensions.length <= index
     
     dim = dimensions[index]
-    for [1..dim.length]
+    for [0...dim.length]
       @slab dimensions, index + 1
 
 module.exports = (data, header, index) ->

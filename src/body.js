@@ -39,7 +39,7 @@ Body = (function() {
     }
     dim = dimensions[index];
     _results = [];
-    for (_i = 1, _ref = dim.length; 1 <= _ref ? _i <= _ref : _i >= _ref; 1 <= _ref ? _i++ : _i--) {
+    for (_i = 0, _ref = dim.length; 0 <= _ref ? _i < _ref : _i > _ref; 0 <= _ref ? _i++ : _i--) {
       _results.push(this.slab(dimensions, index + 1));
     }
     return _results;

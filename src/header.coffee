@@ -18,7 +18,7 @@ class Header
     return @error 'Not a valid NetCDF file' if @lex.string(3) isnt 'CDF'
     version = @lex.byte()
     unless version in [1, 2, 3]
-      throw new Error "I don't know how to read NetCDF version #{version}"
+      throw new Error "Unknown NetCDF format (version #{version})"
     description = 'Classic format' if version is 1
     description = '64 bit offset format' if version is 2
     number: version
@@ -43,7 +43,7 @@ class Header
       throw new Error 'Dimension marker not found'
     @lex.forward constants.dimensionMarker.length
     
-    [1..@lex.uint32()].map => @dim()
+    [0...@lex.uint32()].map => @dim()
   
   dim: =>
     dim =
@@ -69,7 +69,7 @@ class Header
     @lex.forward constants.attributeMarker.length
     
     res = {}
-    for [1..@lex.uint32()]
+    for [0...@lex.uint32()]
       attr = @attr()
       res[attr.name] = attr.value
     res
@@ -90,7 +90,7 @@ class Header
     @lex.forward constants.variableMarker.length
     
     res = {}
-    for [1..@lex.uint32()]
+    for [0...@lex.uint32()]
       variable = @var()
       res[variable.name] = variable.value
     res
@@ -99,7 +99,7 @@ class Header
   var: =>
     name: @name()
     value:
-      dimensions: [1..@lex.uint32()].map => @lex.uint32()
+      dimensions: [0...@lex.uint32()].map => @lex.uint32()
       attributes: @att_list()
       type: @lex.type()
       size: @lex.uint32()
