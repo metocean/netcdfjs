@@ -1,5 +1,5 @@
 Lexer = require './lexer'
-util = require './util'
+constants = require './constants'
 
 class Header
   constructor: (data) ->
@@ -18,34 +18,37 @@ class Header
     return @error 'Not a valid NetCDF file' if @lex.string(3) isnt 'CDF'
     version = @lex.byte()
     unless version in [1, 2, 3]
-      return @error "I don't know how to read NetCDF version #{version}"
+      throw new Error "I don't know how to read NetCDF version #{version}"
     description = 'Classic format' if version is 1
     description = '64 bit offset format' if version is 2
     number: version
     description: description
   
   numrecs: =>
-    numrecs = @lex.bytes 4
-    if util.test.isFFFFFFFF numrecs
+    if @lex.match constants.streamingMarker
+      @lex.forward constants.streamingMarker.length
       type: 'streaming'
     else
-      numrecs = util.convert.uint32 numrecs
+      numrecs = @lex.uint32()
       type: 'fixed'
       number: numrecs
   
   # ABSENT | NC_DIMENSION  nelems  [dim ...]
   dim_list: =>
-    id = @lex.bytes 4
-    return null if util.test.isZero id
-    if not util.test.isDimension id
-      return @error 'Dimension identifier not found'
-    num = @lex.uint32()
-    [1..num].map => @dim()
+    if @lex.match constants.zeroMarker
+      @lex.forward constants.zeroMarker.length
+      return null
+    
+    if not @lex.match constants.dimensionMarker
+      throw new Error 'Dimension marker not found'
+    @lex.forward constants.dimensionMarker.length
+    
+    [1..@lex.uint32()].map => @dim()
   
   dim: =>
     dim =
       name: @name()
-      length: @lex.uint32()
+      length: @lex.uint32() ? 0
     dim.length = null if dim.length is 0
     dim
   
@@ -57,50 +60,48 @@ class Header
   
   # ABSENT | NC_ATTRIBUTE  nelems  [attr ...]
   att_list: =>
-    id = @lex.bytes 4
-    return null if util.test.isZero id
-    if not util.test.isAttribute id
-      return @error 'Attribute identifier not found'
-    num = @lex.uint32()
+    if @lex.match constants.zeroMarker
+      @lex.forward constants.zeroMarker.length
+      return null
+    
+    if not @lex.match constants.attributeMarker
+      throw new Error 'Attribute marker not found'
+    @lex.forward constants.attributeMarker.length
+    
     res = {}
-    for [1..num]
+    for [1..@lex.uint32()]
       attr = @attr()
       res[attr.name] = attr.value
     res
   
   # name  nc_type  nelems  [values ...]
   attr: =>
-    name = @name()
-    converter = util.convert.converter @lex.bytes 4
-    num = @lex.uint32()
-    numbytes = num * converter.bytes
-    value = converter.convert @lex.bytes numbytes
-    @lex.fill numbytes
-    name: name
-    value: value
+    name: @name()
+    value: @lex.reader(@lex.type()) @lex.uint32()
   
   # ABSENT | NC_VARIABLE   nelems  [var ...]
   var_list: =>
-    id = @lex.bytes 4
-    return null if util.test.isZero id
-    if not util.test.isVariable id
-      return @error 'Variable identifier not found'
-    num = @lex.uint32()
+    if @lex.match constants.zeroMarker
+      @lex.forward constants.zeroMarker.length
+      return null
+    
+    if not @lex.match constants.variableMarker
+      throw new Error 'Variable marker not found'
+    @lex.forward constants.variableMarker.length
+    
     res = {}
-    for [1..num]
+    for [1..@lex.uint32()]
       variable = @var()
       res[variable.name] = variable.value
     res
   
   # name  nelems  [dimid ...]  vatt_list  nc_type  vsize  begin
   var: =>
-    name = @name()
-    num = @lex.uint32()
-    name: name
+    name: @name()
     value:
-      dimensions: [1..num].map => @lex.uint32()
+      dimensions: [1..@lex.uint32()].map => @lex.uint32()
       attributes: @att_list()
-      type: util.convert.type @lex.bytes 4
+      type: @lex.type()
       size: @lex.uint32()
       offset: @lex.uint32()
 
