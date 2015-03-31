@@ -14,6 +14,7 @@ Includes [FAQ](https://www.unidata.ucar.edu/software/netcdf/docs/ncFAQ.html), [e
 - [CDMS](http://esg.llnl.gov/cdat/cdms_html/cdms-2.htm)
 
 ## Todo
+- Implement the [CDM](http://www.unidata.ucar.edu/software/thredds/current/netcdf-java/CDM/)
 - Data parsing
 - Arbitrary data slicing and querying
 - Tests!
