@@ -15,7 +15,8 @@ class Header
   
   # 'C'  'D'  'F'  VERSION
   magic: =>
-    return @error 'Not a valid NetCDF file' if @lex.string(3) isnt 'CDF'
+    magicstring = @lex.string(3)
+    throw new Error 'Not a valid NetCDF file ' + magicstring if magicstring isnt 'CDF'
     version = @lex.byte()
     unless version in [1, 2, 3]
       throw new Error "Unknown NetCDF format (version #{version})"
@@ -43,7 +44,10 @@ class Header
       throw new Error 'Dimension marker not found'
     @lex.forward constants.dimensionMarker.length
     
-    [0...@lex.uint32()].map => @dim()
+    count = @lex.uint32()
+    if count is 0 and @lex.uint32() isnt constants.zeroMarker
+      throw new Error 'No dimensions and no absent marker present'
+    [0...count].map => @dim()
   
   dim: =>
     dim =
@@ -68,8 +72,11 @@ class Header
       throw new Error 'Attribute marker not found'
     @lex.forward constants.attributeMarker.length
     
+    count = @lex.uint32()
+    if count is 0 and @lex.uint32() isnt constants.zeroMarker
+      throw new Error 'No attributes and no absent marker present'
     res = {}
-    for [0...@lex.uint32()]
+    for [0...count]
       attr = @attr()
       res[attr.name] = attr.value
     res
@@ -89,8 +96,11 @@ class Header
       throw new Error 'Variable marker not found'
     @lex.forward constants.variableMarker.length
     
+    count = @lex.uint32()
+    if count is 0 and @lex.uint32() isnt constants.zeroMarker
+      throw new Error 'No variables and no absent marker present'
     res = {}
-    for [0...@lex.uint32()]
+    for [0...count]
       variable = @var()
       res[variable.name] = variable.value
     res

@@ -65,7 +65,7 @@ module.exports = class Lexer
   float: => throw new Error 'Not implemented'
   double: => throw new Error 'Not implemented'
   type: =>
-    @forward 4
+    @forward 8
     rmatch = (bytes) => match @d, @i-4, bytes
     return 'byte' if rmatch constants.byteMarker
     return 'char' if rmatch constants.charMarker
