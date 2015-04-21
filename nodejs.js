@@ -5,7 +5,7 @@ fs = require('fs');
 
 netcdf = require('./index');
 
-buf = fs.readFileSync('./examples/singledim.nc', {
+buf = fs.readFileSync('./examples/madis-maritime.nc', {
   encoding: null
 });
 

@@ -6,6 +6,9 @@
     "type": "git",
     "url": "git@github.com:metocean/netcdfjs.git"
   },
+  "scripts": {
+    "test": "mocha test/*.js --reporter spec"
+  },
   "main": "index.js",
   "author": "Thomas Coats",
   "license": "MIT",
@@ -17,5 +20,9 @@
   "dependencies": {
     "text-encoding": "^0.5.2",
     "typedarray": "0.0.6"
+  },
+  "devDependencies": {
+    "chai": "1.*",
+    "mocha": "2.*"
   }
 }

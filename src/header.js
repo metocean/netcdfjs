@@ -12,6 +12,8 @@ Header = (function() {
     this.var_list = bind(this.var_list, this);
     this.attr = bind(this.attr, this);
     this.att_list = bind(this.att_list, this);
+    this.vatt_list = bind(this.vatt_list, this);
+    this.gatt_list = bind(this.gatt_list, this);
     this.name = bind(this.name, this);
     this.dim = bind(this.dim, this);
     this.dim_list = bind(this.dim_list, this);
@@ -26,8 +28,7 @@ Header = (function() {
       version: this.magic(),
       records: this.numrecs(),
       dimensions: this.dim_list(),
-      globalattributes: this.att_list(),
-      attributes: this.att_list(),
+      attributes: this.gatt_list(),
       variables: this.var_list()
     };
   };
@@ -73,8 +74,9 @@ Header = (function() {
   Header.prototype.dim_list = function() {
     var count, i, results;
     if (this.lex.match(constants.zeroMarker)) {
-      this.lex.forward(constants.zeroMarker.length);
-      return null;
+      console.log('no dimensions');
+      this.lex.forward(8);
+      return {};
     }
     if (!this.lex.match(constants.dimensionMarker)) {
       throw new Error('Dimension marker not found');
@@ -115,11 +117,19 @@ Header = (function() {
     return res;
   };
 
+  Header.prototype.gatt_list = function() {
+    return this.att_list();
+  };
+
+  Header.prototype.vatt_list = function() {
+    return this.att_list();
+  };
+
   Header.prototype.att_list = function() {
     var attr, count, i, ref, res;
     if (this.lex.match(constants.zeroMarker)) {
-      this.lex.forward(constants.zeroMarker.length);
-      return null;
+      this.lex.forward(8);
+      return {};
     }
     if (!this.lex.match(constants.attributeMarker)) {
       throw new Error('Attribute marker not found');
@@ -148,7 +158,7 @@ Header = (function() {
     var count, i, ref, res, variable;
     if (this.lex.match(constants.zeroMarker)) {
       this.lex.forward(constants.zeroMarker.length);
-      return null;
+      return {};
     }
     if (!this.lex.match(constants.variableMarker)) {
       throw new Error('Variable marker not found');
@@ -180,7 +190,7 @@ Header = (function() {
             return _this.lex.uint32();
           };
         })(this)),
-        attributes: this.att_list(),
+        attributes: this.vatt_list(),
         type: this.lex.type(),
         size: this.lex.uint32(),
         offset: this.lex.uint32()
@@ -192,6 +202,4 @@ Header = (function() {
 
 })();
 
-module.exports = function(data) {
-  return new Header(data).header();
-};
+module.exports = Header;

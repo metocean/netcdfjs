@@ -17,6 +17,7 @@ module.exports = class Lexer
   hasMore: => @i < @n
   next: => @i++
   forward: (n) => @i += n
+  backwards: (n) => @i -= n
   fill: (n) =>
     b = Math.ceil(n/4) * 4 - n
     return if b is 0
@@ -29,13 +30,10 @@ module.exports = class Lexer
       index++
       return "0#{res}" if res.length is 1
       res
-    b = -> "#{a()}#{a()}#{a()}#{a()}"
+    b = -> "#{a()}#{a()}"
     c = ->
       console.log()
-      console.log "#{b()} #{b()} #{b()} #{b()}"
-      console.log "#{b()} #{b()} #{b()} #{b()}"
-      console.log "#{b()} #{b()} #{b()} #{b()}"
-      console.log "#{b()} #{b()} #{b()} #{b()}"
+      console.log "#{b()} #{b()} #{b()} #{b()} #{b()} #{b()} #{b()} #{b()}"
     c() for i in [1..n]
   
   byte: =>
@@ -65,7 +63,7 @@ module.exports = class Lexer
   float: => throw new Error 'Not implemented'
   double: => throw new Error 'Not implemented'
   type: =>
-    @forward 8
+    @forward 4
     rmatch = (bytes) => match @d, @i-4, bytes
     return 'byte' if rmatch constants.byteMarker
     return 'char' if rmatch constants.charMarker
@@ -73,7 +71,7 @@ module.exports = class Lexer
     return 'int' if rmatch constants.intMarker
     return 'float' if rmatch constants.floatMarker
     return 'double' if rmatch constants.doubleMarker
-    null
+    throw new Error 'Type not found'
   
   chars: (n) =>
     result = @string n
@@ -90,4 +88,6 @@ module.exports = class Lexer
   ints: (n) => [0...n].map => @uint32()
   floats: (n) => [0...n].map => @float()
   doubles: (n) => [0...n].map => @double()
-  reader: (type) => @["#{type}s"]
+  reader: (type) =>
+    throw new Error "A reader for #{type} not found" if !@["#{type}s"]?
+    @["#{type}s"]

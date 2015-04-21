@@ -43,6 +43,7 @@ module.exports = Lexer = (function() {
     this.print = bind(this.print, this);
     this.match = bind(this.match, this);
     this.fill = bind(this.fill, this);
+    this.backwards = bind(this.backwards, this);
     this.forward = bind(this.forward, this);
     this.next = bind(this.next, this);
     this.hasMore = bind(this.hasMore, this);
@@ -66,6 +67,10 @@ module.exports = Lexer = (function() {
 
   Lexer.prototype.forward = function(n) {
     return this.i += n;
+  };
+
+  Lexer.prototype.backwards = function(n) {
+    return this.i -= n;
   };
 
   Lexer.prototype.fill = function(n) {
@@ -96,14 +101,11 @@ module.exports = Lexer = (function() {
       };
     })(this);
     b = function() {
-      return "" + (a()) + (a()) + (a()) + (a());
+      return "" + (a()) + (a());
     };
     c = function() {
       console.log();
-      console.log((b()) + " " + (b()) + " " + (b()) + " " + (b()));
-      console.log((b()) + " " + (b()) + " " + (b()) + " " + (b()));
-      console.log((b()) + " " + (b()) + " " + (b()) + " " + (b()));
-      return console.log((b()) + " " + (b()) + " " + (b()) + " " + (b()));
+      return console.log((b()) + " " + (b()) + " " + (b()) + " " + (b()) + " " + (b()) + " " + (b()) + " " + (b()) + " " + (b()));
     };
     results = [];
     for (i = j = 1, ref = n; 1 <= ref ? j <= ref : j >= ref; i = 1 <= ref ? ++j : --j) {
@@ -167,7 +169,7 @@ module.exports = Lexer = (function() {
 
   Lexer.prototype.type = function() {
     var rmatch;
-    this.forward(8);
+    this.forward(4);
     rmatch = (function(_this) {
       return function(bytes) {
         return match(_this.d, _this.i - 4, bytes);
@@ -191,7 +193,7 @@ module.exports = Lexer = (function() {
     if (rmatch(constants.doubleMarker)) {
       return 'double';
     }
-    return null;
+    throw new Error('Type not found');
   };
 
   Lexer.prototype.chars = function(n) {
@@ -271,6 +273,9 @@ module.exports = Lexer = (function() {
   };
 
   Lexer.prototype.reader = function(type) {
+    if (this[type + "s"] == null) {
+      throw new Error("A reader for " + type + " not found");
+    }
     return this[type + "s"];
   };
 

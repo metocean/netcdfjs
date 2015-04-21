@@ -9,8 +9,7 @@ class Header
     version: @magic()
     records: @numrecs()
     dimensions: @dim_list()
-    globalattributes: @att_list()
-    attributes: @att_list()
+    attributes: @gatt_list()
     variables: @var_list()
   
   # 'C'  'D'  'F'  VERSION
@@ -37,8 +36,9 @@ class Header
   # ABSENT | NC_DIMENSION  nelems  [dim ...]
   dim_list: =>
     if @lex.match constants.zeroMarker
-      @lex.forward constants.zeroMarker.length
-      return null
+      console.log 'no dimensions'
+      @lex.forward 8
+      return {}
     
     if not @lex.match constants.dimensionMarker
       throw new Error 'Dimension marker not found'
@@ -62,11 +62,14 @@ class Header
     @lex.fill length
     res
   
+  gatt_list: => @att_list()
+  vatt_list: => @att_list()
+  
   # ABSENT | NC_ATTRIBUTE  nelems  [attr ...]
   att_list: =>
     if @lex.match constants.zeroMarker
-      @lex.forward constants.zeroMarker.length
-      return null
+      @lex.forward 8
+      return {}
     
     if not @lex.match constants.attributeMarker
       throw new Error 'Attribute marker not found'
@@ -86,15 +89,17 @@ class Header
     name: @name()
     value: @lex.reader(@lex.type()) @lex.uint32()
   
-  # ABSENT | NC_VARIABLE   nelems  [var ...]
+  # ABSENT | NC_VARIABLE nelems  [var ...]
   var_list: =>
     if @lex.match constants.zeroMarker
       @lex.forward constants.zeroMarker.length
-      return null
+      return {}
     
     if not @lex.match constants.variableMarker
       throw new Error 'Variable marker not found'
     @lex.forward constants.variableMarker.length
+    
+    
     
     count = @lex.uint32()
     if count is 0 and @lex.uint32() isnt constants.zeroMarker
@@ -110,9 +115,9 @@ class Header
     name: @name()
     value:
       dimensions: [0...@lex.uint32()].map => @lex.uint32()
-      attributes: @att_list()
+      attributes: @vatt_list()
       type: @lex.type()
       size: @lex.uint32()
       offset: @lex.uint32()
 
-module.exports = (data) -> new Header(data).header()
+module.exports = Header

@@ -27,5 +27,4 @@ class Body
     for [0...dim.length]
       @slab dimensions, index + 1
 
-module.exports = (data, header, index) ->
-  new Body(data).body header, index
+module.exports = Body
