@@ -43,7 +43,7 @@ module.exports = Lexer = (function() {
     this.print = bind(this.print, this);
     this.match = bind(this.match, this);
     this.fill = bind(this.fill, this);
-    this.backwards = bind(this.backwards, this);
+    this.backward = bind(this.backward, this);
     this.forward = bind(this.forward, this);
     this.next = bind(this.next, this);
     this.hasMore = bind(this.hasMore, this);
@@ -69,7 +69,7 @@ module.exports = Lexer = (function() {
     return this.i += n;
   };
 
-  Lexer.prototype.backwards = function(n) {
+  Lexer.prototype.backward = function(n) {
     return this.i -= n;
   };
 
@@ -160,11 +160,35 @@ module.exports = Lexer = (function() {
   };
 
   Lexer.prototype.float = function() {
-    throw new Error('Not implemented');
+    var bytes, exponent, ref, sign, significand;
+    bytes = this.uint32();
+    sign = (ref = bytes & 0x80000000) != null ? ref : -{
+      1: 1
+    };
+    exponent = ((bytes >> 23) & 0xFF) - 127;
+    significand = bytes & ~(-1 << 23);
+    if (exponent === 128) {
+      if (significand) {
+        return sign * Number.NaN;
+      } else {
+        return sign * Number.POSITIVE_INFINITY;
+      }
+    }
+    if (exponent === -127) {
+      if (significand === 0) {
+        return sign * 0.0;
+      }
+      exponent = -126;
+      significand /= 1 << 22;
+    } else {
+      significand = (significand | (1 << 23)) / (1 << 23);
+    }
+    return sign * significand * Math.pow(2, exponent);
   };
 
   Lexer.prototype.double = function() {
-    throw new Error('Not implemented');
+    this.forward(8);
+    return 0;
   };
 
   Lexer.prototype.type = function() {
@@ -193,6 +217,8 @@ module.exports = Lexer = (function() {
     if (rmatch(constants.doubleMarker)) {
       return 'double';
     }
+    this.backward(4);
+    this.print(1);
     throw new Error('Type not found');
   };
 

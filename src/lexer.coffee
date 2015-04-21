@@ -17,7 +17,7 @@ module.exports = class Lexer
   hasMore: => @i < @n
   next: => @i++
   forward: (n) => @i += n
-  backwards: (n) => @i -= n
+  backward: (n) => @i -= n
   fill: (n) =>
     b = Math.ceil(n/4) * 4 - n
     return if b is 0
@@ -60,8 +60,30 @@ module.exports = class Lexer
     # TODO: find out the best way to handle 64 bit ints in javascript
     @forward 8
     @d[@i-4] << 24 | @d[@i-3] << 16 | @d[@i-2] << 8 | @d[@i-1]
-  float: => throw new Error 'Not implemented'
-  double: => throw new Error 'Not implemented'
+  float: =>
+    bytes = @uint32()
+    sign = (bytes & 0x80000000) ? -1 : 1
+    exponent = ((bytes >> 23) & 0xFF) - 127
+    significand = (bytes & ~(-1 << 23))
+
+    if exponent is 128
+      if significand
+        return sign * Number.NaN
+      else
+        return sign * Number.POSITIVE_INFINITY
+
+    if exponent is -127
+      return sign * 0.0 if significand is 0
+      exponent = -126
+      significand /= (1 << 22)
+    else
+      significand = (significand | (1 << 23)) / (1 << 23)
+    
+    sign * significand * Math.pow 2, exponent
+  double: =>
+    @forward 8
+    0
+    #throw new Error 'Not implemented'
   type: =>
     @forward 4
     rmatch = (bytes) => match @d, @i-4, bytes
@@ -71,6 +93,9 @@ module.exports = class Lexer
     return 'int' if rmatch constants.intMarker
     return 'float' if rmatch constants.floatMarker
     return 'double' if rmatch constants.doubleMarker
+    
+    @backward 4
+    @print 1
     throw new Error 'Type not found'
   
   chars: (n) =>
