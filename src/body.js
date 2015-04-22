@@ -4,7 +4,7 @@ var Body, Lexer,
 
 Lexer = require('./lexer');
 
-Body = (function() {
+module.exports = Body = (function() {
   function Body(data) {
     this.slab = bind(this.slab, this);
     this.body = bind(this.body, this);
@@ -12,7 +12,7 @@ Body = (function() {
   }
 
   Body.prototype.body = function(header, index) {
-    var dim, dimensions, j, key, len, variable;
+    var dim, dimensions, fill, j, key, len, reader, type, variable;
     key = Object.keys(header.variables)[index];
     variable = header.variables[key];
     dimensions = variable.dimensions.map(function(i) {
@@ -24,23 +24,30 @@ Body = (function() {
         dim.length = header.records.number;
       }
     }
+    type = variable.type;
+    fill = variable.attributes._FillValue || this.lex.fillForType(type);
+    reader = this.lex.readerForType(type, fill);
     this.lex.go(variable.offset);
     return {
       key: key,
       variable: variable,
-      dimensions: dimensions
+      dimensions: dimensions,
+      data: this.slab(dimensions, 0, reader)
     };
   };
 
-  Body.prototype.slab = function(dimensions, index, convert) {
+  Body.prototype.slab = function(dimensions, index, read) {
     var dim, j, ref, results;
-    if (dimensions.length <= index) {
-      return this.lex.byte();
+    if (dimensions.length === 0) {
+      return read(1);
+    }
+    if (index === dimensions.length - 1) {
+      return read(dimensions[index].length);
     }
     dim = dimensions[index];
     results = [];
     for (j = 0, ref = dim.length; 0 <= ref ? j < ref : j > ref; 0 <= ref ? j++ : j--) {
-      results.push(this.slab(dimensions, index + 1));
+      results.push(this.slab(dimensions, index + 1, read));
     }
     return results;
   };
@@ -48,5 +55,3 @@ Body = (function() {
   return Body;
 
 })();
-
-module.exports = Body;

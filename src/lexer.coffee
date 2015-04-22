@@ -1,5 +1,6 @@
 decoder = new require('text-encoding').TextDecoder 'utf-8'
 constants = require './constants'
+binary = require './binary'
 
 match = (data, index, bytes) ->
   return no if index + bytes.length > data.length
@@ -61,29 +62,13 @@ module.exports = class Lexer
     @forward 8
     @d[@i-4] << 24 | @d[@i-3] << 16 | @d[@i-2] << 8 | @d[@i-1]
   float: =>
-    bytes = @uint32()
-    sign = (bytes & 0x80000000) ? -1 : 1
-    exponent = ((bytes >> 23) & 0xFF) - 127
-    significand = (bytes & ~(-1 << 23))
-
-    if exponent is 128
-      if significand
-        return sign * Number.NaN
-      else
-        return sign * Number.POSITIVE_INFINITY
-
-    if exponent is -127
-      return sign * 0.0 if significand is 0
-      exponent = -126
-      significand /= (1 << 22)
-    else
-      significand = (significand | (1 << 23)) / (1 << 23)
-    
-    sign * significand * Math.pow 2, exponent
+    @forward 4
+    bytes = [@d[@i-4], @d[@i-3], @d[@i-2], @d[@i-1]]
+    binary.readFloat bytes
   double: =>
     @forward 8
-    0
-    #throw new Error 'Not implemented'
+    bytes = [@d[@i-8], @d[@i-7], @d[@i-6], @d[@i-5], @d[@i-4], @d[@i-3], @d[@i-2], @d[@i-1]]
+    binary.readFloat bytes
   type: =>
     @forward 4
     rmatch = (bytes) => match @d, @i-4, bytes
@@ -113,6 +98,13 @@ module.exports = class Lexer
   ints: (n) => [0...n].map => @uint32()
   floats: (n) => [0...n].map => @float()
   doubles: (n) => [0...n].map => @double()
-  reader: (type) =>
+  readerForType: (type, fill) =>
     throw new Error "A reader for #{type} not found" if !@["#{type}s"]?
-    @["#{type}s"]
+    f = @["#{type}s"]
+    return f if !fill?
+    (n) =>
+      res = f n
+      res.map (v) -> if v is fill then null else v
+  fillForType: (type) =>
+    throw new Error "No fill found for #{type}" if !constants["#{type}Fill"]?
+    constants["#{type}Fill"]

@@ -4,4 +4,5 @@ netcdf = require './index'
 buf = fs.readFileSync './examples/madis-maritime.nc', encoding: null
 data = new Uint8Array buf
 header = netcdf.header data
-console.log JSON.stringify header, null, 2
+body = netcdf.body data, header, 0
+console.log JSON.stringify body, null, 2

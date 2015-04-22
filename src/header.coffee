@@ -87,7 +87,7 @@ class Header
   # name  nc_type  nelems  [values ...]
   attr: =>
     name: @name()
-    value: @lex.reader(@lex.type()) @lex.uint32()
+    value: @lex.readerForType(@lex.type()) @lex.uint32()
   
   # ABSENT | NC_VARIABLE nelems  [var ...]
   var_list: =>
@@ -98,8 +98,6 @@ class Header
     if not @lex.match constants.variableMarker
       throw new Error 'Variable marker not found'
     @lex.forward constants.variableMarker.length
-    
-    
     
     count = @lex.uint32()
     if count is 0 and @lex.uint32() isnt constants.zeroMarker

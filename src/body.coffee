@@ -1,6 +1,6 @@
 Lexer = require './lexer'
 
-class Body
+module.exports = class Body
   constructor: (data) ->
     @lex = new Lexer data
   
@@ -12,19 +12,23 @@ class Body
     for dim in dimensions
       dim.length = header.records.number if dim.length is null
     
+    type = variable.type
+    fill = variable.attributes._FillValue or @lex.fillForType type
+    reader = @lex.readerForType type, fill
+    
     @lex.go variable.offset
-    #data = @slab dimensions, 0, util.convert.converterForType variable.type
     
     key: key
     variable: variable
     dimensions: dimensions
-    #data: data
+    data: @slab dimensions, 0, reader
   
-  slab: (dimensions, index, convert) =>
-    return @lex.byte() if dimensions.length <= index
+  slab: (dimensions, index, read) =>
+    return read 1 if dimensions.length is 0
+    
+    if index is dimensions.length - 1
+      return read dimensions[index].length
     
     dim = dimensions[index]
     for [0...dim.length]
-      @slab dimensions, index + 1
-
-module.exports = Body
+      @slab dimensions, index + 1, read

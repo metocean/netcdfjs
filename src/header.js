@@ -150,7 +150,7 @@ Header = (function() {
   Header.prototype.attr = function() {
     return {
       name: this.name(),
-      value: this.lex.reader(this.lex.type())(this.lex.uint32())
+      value: this.lex.readerForType(this.lex.type())(this.lex.uint32())
     };
   };
 
