@@ -11,9 +11,11 @@ module.exports = Body = (function() {
     this.lex = new Lexer(data);
   }
 
-  Body.prototype.body = function(header, index) {
-    var dim, dimensions, fill, j, key, len, reader, type, variable;
-    key = Object.keys(header.variables)[index];
+  Body.prototype.body = function(header, key) {
+    var dim, dimensions, fill, j, len, reader, type, variable;
+    if (typeof key !== 'string') {
+      key = Object.keys(header.variables)[key];
+    }
     variable = header.variables[key];
     dimensions = variable.dimensions.map(function(i) {
       return header.dimensions[i];

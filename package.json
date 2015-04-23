@@ -9,6 +9,9 @@
   "scripts": {
     "test": "mocha test/*.js --reporter spec"
   },
+  "bin": {
+    "ncjsdump": "bin/ncjsdump.js"
+  },
   "main": "index.js",
   "author": "Thomas Coats",
   "license": "MIT",
@@ -18,6 +21,7 @@
   "readmeFilename": "README.md",
   "homepage": "https://github.com/metocean/netcdfjs",
   "dependencies": {
+    "chalk": "^1.0.0",
     "text-encoding": "^0.5.2",
     "typedarray": "0.0.6"
   },

@@ -4,8 +4,9 @@ module.exports = class Body
   constructor: (data) ->
     @lex = new Lexer data
   
-  body: (header, index) =>
-    key = Object.keys(header.variables)[index]
+  body: (header, key) =>
+    if typeof(key) isnt 'string'
+      key = Object.keys(header.variables)[key]
     variable = header.variables[key]
     dimensions = variable.dimensions.map (i) -> header.dimensions[i]
     # presuming non-streaming
