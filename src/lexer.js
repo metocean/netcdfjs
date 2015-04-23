@@ -23,6 +23,7 @@ match = function(data, index, bytes) {
 
 module.exports = Lexer = (function() {
   function Lexer(data) {
+    this.sizeForType = bind(this.sizeForType, this);
     this.fillForType = bind(this.fillForType, this);
     this.readerForType = bind(this.readerForType, this);
     this.doubles = bind(this.doubles, this);
@@ -289,7 +290,7 @@ module.exports = Lexer = (function() {
       throw new Error("A reader for " + type + " not found");
     }
     f = this[type + "s"];
-    if (fill == null) {
+    if ((fill == null) || type === 'char') {
       return f;
     }
     return (function(_this) {
@@ -312,6 +313,13 @@ module.exports = Lexer = (function() {
       throw new Error("No fill found for " + type);
     }
     return constants[type + "Fill"];
+  };
+
+  Lexer.prototype.sizeForType = function(type) {
+    if (constants[type + "Size"] == null) {
+      throw new Error("No size found for " + type);
+    }
+    return constants[type + "Size"];
   };
 
   return Lexer;

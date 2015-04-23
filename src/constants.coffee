@@ -12,9 +12,16 @@ module.exports =
   floatMarker: [0, 0, 0, 5]
   doubleMarker: [0, 0, 0, 6]
 
-  charFill: 0
   byteFill: -127
+  charFill: 0
   shortFill: -32767
   intFill: -2147483647
   floatFill: 9.969209968386869e+36
   doubleFill: 9.969209968386869e+36
+  
+  byteSize: 1
+  charSize: 1
+  shortSize: 2
+  intSize: 4
+  floatSize: 4
+  doubleSize: 8

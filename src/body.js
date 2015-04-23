@@ -17,7 +17,7 @@ module.exports = Body = (function() {
       key = Object.keys(header.variables)[key];
     }
     variable = header.variables[key];
-    dimensions = variable.dimensions.map(function(i) {
+    dimensions = variable.dimensions.indexes.map(function(i) {
       return header.dimensions[i];
     });
     for (j = 0, len = dimensions.length; j < len; j++) {

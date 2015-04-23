@@ -9,7 +9,7 @@ Usage: #{chalk.cyan 'ncjsdump'} <netcdf file> [<variable>]
 
    The default action is to print the NetCDF header
    
-   When passed a variable name the variable details
+   When passed a variable name the variable's details
    and data will be printed
    
 """

@@ -7,7 +7,7 @@ fs = require('fs');
 
 args = process.argv.slice(2);
 
-usage = "\nUsage: " + (chalk.cyan('ncjsdump')) + " <netcdf file> [<variable>]\n\n   The default action is to print the NetCDF header\n   \n   When passed a variable name the variable details\n   and data will be printed\n   ";
+usage = "\nUsage: " + (chalk.cyan('ncjsdump')) + " <netcdf file> [<variable>]\n\n   The default action is to print the NetCDF header\n   \n   When passed a variable name the variable's details\n   and data will be printed\n   ";
 
 if (args.length === 0 || args.length > 2) {
   console.error(usage);

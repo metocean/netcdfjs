@@ -101,10 +101,13 @@ module.exports = class Lexer
   readerForType: (type, fill) =>
     throw new Error "A reader for #{type} not found" if !@["#{type}s"]?
     f = @["#{type}s"]
-    return f if !fill?
+    return f if !fill? or type is 'char'
     (n) =>
       res = f n
       res.map (v) -> if v is fill then null else v
   fillForType: (type) =>
     throw new Error "No fill found for #{type}" if !constants["#{type}Fill"]?
     constants["#{type}Fill"]
+  sizeForType: (type) =>
+    throw new Error "No size found for #{type}" if !constants["#{type}Size"]?
+    constants["#{type}Size"]

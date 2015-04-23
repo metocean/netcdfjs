@@ -8,10 +8,12 @@ module.exports = class Body
     if typeof(key) isnt 'string'
       key = Object.keys(header.variables)[key]
     variable = header.variables[key]
-    dimensions = variable.dimensions.map (i) -> header.dimensions[i]
+    dimensions = variable.dimensions.indexes.map (i) ->
+      header.dimensions[i]
     # presuming non-streaming
     for dim in dimensions
       dim.length = header.records.number if dim.length is null
+    
     
     type = variable.type
     fill = variable.attributes._FillValue or @lex.fillForType type
