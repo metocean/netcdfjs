@@ -1,3 +1,5 @@
+decoder = new require('text-encoding').TextDecoder 'utf-8'
+
 # Extracted from https://github.com/jDataView/jDataView/blob/master/src/jdataview.js
 
 pow2 = (n) ->
@@ -43,10 +45,23 @@ writeFloat = (value, mantSize, expSize) ->
   b
 
 module.exports =
-  readFloat: (b) ->
-    sign = 1 - 2 * (b[0] >> 7)
-    exponent = (b[0] << 1 & 0xff | b[1] >> 7) - 127
-    mantissa = (b[1] & 0x7f) << 16 | b[2] << 8 | b[3]
+  readByte: (b, i) ->
+    i = 0 if !i?
+    b[i]
+  readChar: (b, i) ->
+    i = 0 if !i?
+    String.fromCharCode b[i]
+  readShort: (b, i) ->
+    i = 0 if !i?
+    b[i] << 8 | b[i+1]
+  readInt: (b, i) ->
+    i = 0 if !i?
+    b[i] << 24 | b[i+1] << 16 | b[i+2] << 8 | b[i+3]
+  readFloat: (b, i) ->
+    i = 0 if !i?
+    sign = 1 - 2 * (b[i] >> 7)
+    exponent = (b[i] << 1 & 0xff | b[i+1] >> 7) - 127
+    mantissa = (b[i+1] & 0x7f) << 16 | b[i+2] << 8 | b[i+3]
     if exponent is 128
       if mantissa isnt 0
         return NaN
@@ -55,10 +70,11 @@ module.exports =
     if exponent is -127
       return sign * mantissa * pow2(-126 - 23)
     sign * (1 + mantissa * pow2(-23)) * pow2(exponent)
-  readDouble: (b) ->
-    sign = 1 - 2 * (b[0] >> 7)
-    exponent = ((b[0] << 1 & 0xff) << 3 | b[1] >> 4) - ((1 << 10) - 1)
-    mantissa = (b[1] & 0x0f) * pow2(48) + b[2] * pow2(40) + b[3] * pow2(32) + b[4] * pow2(24) + b[5] * pow2(16) + b[6] * pow2(8) + b[7]
+  readDouble: (b, i) ->
+    i = 0 if !i?
+    sign = 1 - 2 * (b[i] >> 7)
+    exponent = ((b[i] << 1 & 0xff) << 3 | b[i+1] >> 4) - ((1 << 10) - 1)
+    mantissa = (b[i+1] & 0x0f) * pow2(48) + b[i+2] * pow2(40) + b[i+3] * pow2(32) + b[i+4] * pow2(24) + b[i+5] * pow2(16) + b[i+6] * pow2(8) + b[i+7]
     if exponent is 1024
       if mantissa isnt 0
         return NaN
@@ -67,5 +83,7 @@ module.exports =
     if exponent is -1023
       return sign * mantissa * pow2(-1022 - 52)
     sign * (1 + mantissa * pow2(-52)) * pow2(exponent)
+  readString: (b) ->
+    decoder.decode b
   writeFloat: (value) -> writeFloat value, 23, 8
   writeDouble: (value) -> writeFloat value, 52, 11

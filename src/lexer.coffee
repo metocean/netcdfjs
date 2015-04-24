@@ -21,7 +21,6 @@ module.exports = class Lexer
   backward: (n) => @i -= n
   fill: (n) =>
     b = Math.ceil(n/4) * 4 - n
-    return if b is 0
     @i += b
   match: (bytes) => match @d, @i, bytes
   print: (n) =>

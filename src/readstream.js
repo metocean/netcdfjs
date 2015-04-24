@@ -18,7 +18,9 @@ module.exports = function(file) {
       return;
     }
     requests.shift();
-    request.cb(new Uint8Array(chunk));
+    if (request.cb != null) {
+      request.cb(new Uint8Array(chunk));
+    }
     return drain();
   };
   read.on('readable', function() {

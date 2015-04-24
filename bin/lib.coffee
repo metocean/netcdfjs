@@ -20,26 +20,28 @@ if args.length is 0 or args.length > 2
 
 file = args[0]
 
-fs = require 'fs'
-netcdf = require '../index'
-buf = fs.readFileSync file, encoding: null
-data = new Uint8Array buf
-header = netcdf.header data
+readstream = require '../src/readstream'
+netcdf = require '../'
 
-if args.length is 1
-  console.log JSON.stringify header, null, 2
+buffer = readstream file
+netcdf.header buffer, (header) ->
+  if args.length is 1
+    console.log JSON.stringify header, null, 2
+    process.exit 0
+
+  variable = args[1]
+
+  if !header.variables[variable]?
+    console.error()
+    console.error "  Variable #{chalk.cyan variable} not found"
+    console.error()
+    console.error "  Variables available: #{Object.keys(header.variables).join ', '}"
+    console.error()
+    process.exit -1
+
+  fs = require 'fs'
+  buf = fs.readFileSync file, encoding: null
+  data = new Uint8Array buf
+  body = netcdf.body data, header, variable
+  console.log JSON.stringify body, null, 2
   process.exit 0
-
-variable = args[1]
-
-if !header.variables[variable]?
-  console.error()
-  console.error "  Variable #{chalk.cyan variable} not found"
-  console.error()
-  console.error "  Variables available: #{Object.keys(header.variables).join ', '}"
-  console.error()
-  process.exit -1
-
-body = netcdf.body data, header, variable
-console.log JSON.stringify body, null, 2
-process.exit 0

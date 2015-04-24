@@ -22,6 +22,7 @@
   "homepage": "https://github.com/metocean/netcdfjs",
   "dependencies": {
     "chalk": "^1.0.0",
+    "odo-async": "^1.0.0",
     "text-encoding": "^0.5.2",
     "typedarray": "0.0.6"
   },

@@ -20,7 +20,9 @@ module.exports = function(buffer) {
         return;
       }
       index += n;
-      return cb(new TA.Uint8Array(buffer, index - n, n));
+      if (cb != null) {
+        return cb(new TA.Uint8Array(buffer, index - n, n));
+      }
     },
     on: function(e, cb) {
       if (e === 'end') {

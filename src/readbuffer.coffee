@@ -10,6 +10,7 @@ module.exports = (buffer) ->
       ends = []
       return
     index += n
-    cb new TA.Uint8Array buffer, index - n, n
+    if cb?
+      cb new TA.Uint8Array buffer, index - n, n
   on: (e, cb) ->
     ends.push cb if e is 'end'

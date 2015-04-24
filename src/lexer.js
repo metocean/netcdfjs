@@ -80,9 +80,6 @@ module.exports = Lexer = (function() {
   Lexer.prototype.fill = function(n) {
     var b;
     b = Math.ceil(n / 4) * 4 - n;
-    if (b === 0) {
-      return;
-    }
     return this.i += b;
   };
 

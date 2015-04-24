@@ -6,14 +6,12 @@
 # body = netcdf.body data, header, 0
 # console.log JSON.stringify body, null, 2
 
-
 readstream = require './src/readstream'
 
+#b = readstream './examples/singledim.nc'
+b = readstream './examples/WMI_Lear.nc'
 
-b = readstream './examples/singledim.nc'
+netcdf = require './index'
 
-
-b.read 1, (buf) -> console.log buf
-b.read 1, (buf) -> console.log buf
-b.read 1, (buf) -> console.log buf
-b.read 1, (buf) -> console.log buf
+netcdf.header b, (res) ->
+  console.log JSON.stringify res, null, 2

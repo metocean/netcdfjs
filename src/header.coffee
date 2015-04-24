@@ -1,31 +1,40 @@
-Lexer = require './lexer'
-constants = require './constants'
+roundup = require './roundup'
+async = require 'odo-async'
 
-roundup = (num, multiple) ->
-  return num if multiple is 0
-  remainder = num % multiple
-  return num if remainder is 0
-  num + multiple - remainder
+marker =
+  streaming: -1
+  zero: 0
+  dimension: 10
+  variable: 11
+  attribute: 12
 
-class Header
-  constructor: (data) ->
-    @lex = new Lexer data
+module.exports = (buffer, callback) ->
+  one = require('./primatives') buffer
+  many = require('./arrays') buffer
+  fill = require('./arraysfill') buffer
+  type = require('./types') buffer
   
-  header: =>
-    @precompute
-      version: @magic()
-      records: @numrecs()
-      dimensions: @dim_list()
-      attributes: @gatt_list()
-      variables: @var_list()
+  header = (cb) ->
+    result = {}
+    magic (res) ->
+      result.version = res
+      numrecs (res) ->
+        result.records = res
+        dim_list (res) ->
+          result.dimensions = res
+          gatt_list (res) ->
+            result.attributes = res
+            var_list (res) ->
+              result.variables = res
+              cb precompute result
   
-  precompute: (header) =>
+  precompute = (header) ->
     for dim in header.dimensions
       if dim.length is null
         header.records.dimension = dim.index
         break
     
-    @precompute_size v, header for _, v of header.variables
+    precompute_size v, header for _, v of header.variables
     
     header.hassinglerecord = false
     for _, v of header.variables
@@ -48,7 +57,7 @@ class Header
     header
   
   # Note on vsize: This number is the product of the dimension lengths (omitting the record dimension) and the number of bytes per value (determined from the type), increased to the next multiple of 4, for each variable. If a record variable, this is the amount of space per record (except that, for backward compatibility, it always includes padding to the next multiple of 4 bytes, even in the exceptional case noted below under "Note on padding"). The netCDF "record size" is calculated as the sum of the vsize's of all the record variables.
-  precompute_size: (variable, header) =>
+  precompute_size = (variable, header) ->
     indexes = variable.dimensions
     variable.dimensions =
         indexes: indexes
@@ -66,12 +75,12 @@ class Header
     variable.dimensions.products = products
     
     sizes = products.map (p) -> p * variable.size
-    variable.dimensions.sizes = products.map (p) =>
-      p * @lex.sizeForType variable.type
+    variable.dimensions.sizes = products.map (p) ->
+      p * type.size variable.type
     
     variable.isrecord = header.dimensions[indexes[0]].length is null
     
-    size = @lex.sizeForType variable.type
+    size = type.size variable.type
     if variable.dimensions.indexes.length < 2
       return variable.size = size
     size = if variable.isrecord
@@ -81,112 +90,124 @@ class Header
     variable.size = size
   
   # 'C'  'D'  'F'  VERSION
-  magic: =>
-    magicstring = @lex.string(3)
-    throw new Error 'Not a valid NetCDF file ' + magicstring if magicstring isnt 'CDF'
-    version = @lex.byte()
-    unless version in [1, 2, 3]
-      throw new Error "Unknown NetCDF format (version #{version})"
-    description = 'Classic format' if version is 1
-    description = '64 bit offset format' if version is 2
-    number: version
-    description: description
+  magic = (cb) ->
+    many.char 3, (magicstring) ->
+      throw new Error 'Not a valid NetCDF file ' + magicstring if magicstring isnt 'CDF'
+    one.byte (version) ->
+      unless version in [1, 2, 3]
+        throw new Error "Unknown NetCDF format (version #{version})"
+      description = 'Classic format' if version is 1
+      description = '64 bit offset format' if version is 2
+      cb
+        number: version
+        description: description
   
-  numrecs: =>
-    if @lex.match constants.streamingMarker
-      @lex.forward constants.streamingMarker.length
-      type: 'streaming'
-    else
-      numrecs = @lex.uint32()
-      type: 'fixed'
-      number: numrecs
+  numrecs = (cb) ->
+    one.int (count) ->
+      if count is marker.streaming
+        return cb type: 'streaming'
+      cb
+        type: 'fixed'
+        number: count
   
   # ABSENT | NC_DIMENSION  nelems  [dim ...]
-  dim_list: =>
-    if @lex.match constants.zeroMarker
-      console.log 'no dimensions'
-      @lex.forward 8
-      return {}
-    
-    if not @lex.match constants.dimensionMarker
-      throw new Error 'Dimension marker not found'
-    @lex.forward constants.dimensionMarker.length
-    
-    count = @lex.uint32()
-    if count is 0 and @lex.uint32() isnt constants.zeroMarker
-      throw new Error 'No dimensions and no absent marker present'
-    [0...count].map (index) =>
-      res = @dim()
-      res.index = index
-      res
+  dim_list = (cb) ->
+    one.int (mark) ->
+      if mark is marker.zero
+        return one.int -> cb {}
+      
+      if mark isnt marker.dimension
+        throw new Error 'Dimension marker not found'
+      
+      one.int (count) ->
+        result = []
+        tasks = [0...count].map (index) ->
+          (cb) -> dim (res) ->
+            res.index = index
+            result.push res
+            cb res
+        async.series tasks, -> cb result
   
-  dim: =>
-    dim =
-      name: @name()
-      length: @lex.uint32() ? 0
-    dim.length = null if dim.length is 0
-    dim
+  dim = (cb) ->
+    name (name) ->
+      one.int (length) ->
+        length = null if length is 0
+        cb
+          name: name
+          length: length
   
-  name: =>
-    length = @lex.uint32()
-    res = @lex.string length
-    @lex.fill length
-    res
+  name = (cb) ->
+    one.int (length) ->
+      fill.char length, cb
   
-  gatt_list: => @att_list()
-  vatt_list: => @att_list()
+  gatt_list = (cb) -> att_list cb
+  vatt_list = (cb) -> att_list cb
   
   # ABSENT | NC_ATTRIBUTE  nelems  [attr ...]
-  att_list: =>
-    if @lex.match constants.zeroMarker
-      @lex.forward 8
-      return {}
-    
-    if not @lex.match constants.attributeMarker
-      throw new Error 'Attribute marker not found'
-    @lex.forward constants.attributeMarker.length
-    
-    count = @lex.uint32()
-    if count is 0 and @lex.uint32() isnt constants.zeroMarker
-      throw new Error 'No attributes and no absent marker present'
-    res = {}
-    for [0...count]
-      attr = @attr()
-      res[attr.name] = attr.value
-    res
+  att_list = (cb) ->
+    one.int (mark) ->
+      if mark is marker.zero
+        return one.int -> cb {}
+      
+      if mark isnt marker.attribute
+        throw new Error 'Attribute marker not found'
+      
+      one.int (count) ->
+        result = {}
+        tasks = [0...count].map ->
+          (cb) -> attr (attr) ->
+            result[attr.name] = attr.value
+            cb()
+        async.series tasks, -> cb result
   
   # name  nc_type  nelems  [values ...]
-  attr: =>
-    name: @name()
-    value: @lex.readerForType(@lex.type()) @lex.uint32()
+  attr = (cb) ->
+    name (name) ->
+      type.type (t) ->
+        one.int (count) ->
+          type.reader(t) count, (value) ->
+            cb
+              name: name
+              value: value
   
   # ABSENT | NC_VARIABLE nelems  [var ...]
-  var_list: =>
-    if @lex.match constants.zeroMarker
-      @lex.forward constants.zeroMarker.length
-      return {}
-    
-    if not @lex.match constants.variableMarker
-      throw new Error 'Variable marker not found'
-    @lex.forward constants.variableMarker.length
-    
-    count = @lex.uint32()
-    if count is 0 and @lex.uint32() isnt constants.zeroMarker
-      throw new Error 'No variables and no absent marker present'
-    res = {}
-    for [0...count]
-      variable = @var()
-      res[variable.name] = variable.value
-    res
+  var_list = (cb) ->
+    one.int (mark) ->
+      if mark is marker.zero
+        return one.int -> cb {}
+      
+      if mark isnt marker.variable
+        throw new Error 'Attribute marker not found'
+      
+      one.int (count) ->
+        result = {}
+        tasks = [0...count].map ->
+          (cb) -> variable (variable) ->
+            result[variable.name] = variable.value
+            cb()
+        async.series tasks, -> cb result
   
   # name  nelems  [dimid ...]  vatt_list  nc_type  vsize  begin
-  var: =>
-    name: @name()
-    value:
-      dimensions: [0...@lex.uint32()].map => @lex.uint32()
-      attributes: @vatt_list()
-      type: @lex.type()
-      size: @lex.uint32()
-      offset: @lex.uint32()
-
-module.exports = Header
+  variable = (cb) ->
+    name (name) ->
+      one.int (dimnum) ->
+        dimindexes = []
+        tasks = [0...dimnum].map ->
+          (cb) -> one.int (index) ->
+            dimindexes.push index
+            cb()
+        async.series tasks, ->
+          vatt_list (attributes) ->
+            type.type (t) ->
+              one.int (size) ->
+                one.int (offset) ->
+                  cb
+                    name: name
+                    value:
+                      dimensions: dimindexes
+                      attributes: attributes
+                      type: t
+                      size: size
+                      offset: offset
+  
+  header (res) -> callback res
