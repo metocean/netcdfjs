@@ -26,6 +26,7 @@ module.exports = (buffer, callback) ->
             result.attributes = res
             var_list (res) ->
               result.variables = res
+              buffer.close()
               cb precompute result
   
   precompute = (header) ->
@@ -44,7 +45,6 @@ module.exports = (buffer, callback) ->
           break
         header.hassinglerecord = yes
     
-    # Note on padding: In the special case when there is only one record variable and it is of type character, byte, or short, no padding is used between record slabs, so records after the first record do not necessarily start on four-byte boundaries.
     unless header.hassinglerecord
       for _, v of header.variables
         v.size = roundup v.size, 4
@@ -56,7 +56,6 @@ module.exports = (buffer, callback) ->
     
     header
   
-  # Note on vsize: This number is the product of the dimension lengths (omitting the record dimension) and the number of bytes per value (determined from the type), increased to the next multiple of 4, for each variable. If a record variable, this is the amount of space per record (except that, for backward compatibility, it always includes padding to the next multiple of 4 bytes, even in the exceptional case noted below under "Note on padding"). The netCDF "record size" is calculated as the sum of the vsize's of all the record variables.
   precompute_size = (variable, header) ->
     indexes = variable.dimensions
     variable.dimensions =

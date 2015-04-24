@@ -14,7 +14,6 @@ module.exports = class Body
     for dim in dimensions
       dim.length = header.records.number if dim.length is null
     
-    
     type = variable.type
     fill = variable.attributes._FillValue or @lex.fillForType type
     reader = @lex.readerForType type, fill

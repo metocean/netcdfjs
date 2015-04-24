@@ -32,6 +32,7 @@ module.exports = function(buffer, callback) {
             result.attributes = res;
             return var_list(function(res) {
               result.variables = res;
+              buffer.close();
               return cb(precompute(result));
             });
           });
