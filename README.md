@@ -17,13 +17,14 @@ Read NetCDF files in the browser or with Node.js
 ## Example
 
 ```js
-// Read the header of a NetCDF file
 var readstream = require('netcdf/fs/readstream');
 var readrandom = require('netcdf/fs/readrandom');
 var netcdf = require('netcdf');
 
 var file = './examples/WMI_Lear.nc';
 var headerbuffer = readstream(file);
+
+// Read the header of a NetCDF file
 netcdf.readheader(headerbuffer, function(header) {
   console.log(JSON.stringify(header, null, 2));
   
