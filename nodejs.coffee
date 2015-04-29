@@ -1,32 +1,36 @@
-# fs = require 'fs'
-# buf = fs.readFileSync './examples/singledim.nc', encoding: null
-# data = new Uint8Array buf
-# netcdf = require './index'
-# header = netcdf.header data
-# body = netcdf.body data, header, 0
-# console.log JSON.stringify body, null, 2
-
-# fs = require 'fs'
-# buf = fs.readFileSync './examples/singledim.nc', encoding: null
-# data = new Uint8Array buf
-# netcdf = require './index'
-# header = netcdf.header data
-# body = netcdf.body data, header, 0
-# console.log JSON.stringify body, null, 2
-
-
-
 readfile = require './src/readfile'
 readstream = require './src/readstream'
 readrandom = require './src/readrandom'
 netcdf = require './index'
 
+printdelta = (delta) ->
+  "#{delta[0]}s #{delta[1]/1000000}ms"
+
 # file = '/Users/tcoats/Desktop/abis20141222_18z_uds.nc'
-file = './examples/WMI_Lear.nc'
+start = process.hrtime()
+file = './examples/s20150211_12z.nc'
 headerbuffer = readstream file
-recordbuffer = readrandom file
 
 netcdf.header headerbuffer, (header) ->
   console.log JSON.stringify header, null, 2
-  netcdf.records header, recordbuffer, (err, records) ->
-    console.log Object.keys records
+  headertime = process.hrtime start
+  
+  start = process.hrtime()
+  recordbuffer = readrandom file
+  netcdf.variable header, recordbuffer, 'freq', (err, data) ->
+    return console.error err if err?
+    variabletime = process.hrtime start
+    console.log data
+    #console.log records.wdir
+    console.log "header parsed in #{printdelta headertime}"
+    console.log "variable parsed in #{printdelta variabletime}"
+  
+  # start = process.hrtime()
+  # recordbuffer = readrandom file
+  # netcdf.records header, recordbuffer, (err, records) ->
+  #   return console.error err if err?
+  #   recordstime = process.hrtime start
+  #   console.log "#{header.records.number} records"
+  #   console.log Object.keys records
+  #   console.log "header parsed in #{printdelta headertime}"
+  #   console.log "records parsed in #{printdelta recordstime}"

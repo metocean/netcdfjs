@@ -41,7 +41,7 @@ module.exports = function(buffer, callback) {
     });
   };
   precompute = function(header) {
-    var _, dim, j, len, name, ref, ref1, ref2, ref3, ref4, ref5, v;
+    var _, dim, j, len, name, ref, ref1, ref2, ref3, ref4, v;
     ref = header.dimensions;
     for (j = 0, len = ref.length; j < len; j++) {
       dim = ref[j];
@@ -67,28 +67,24 @@ module.exports = function(buffer, callback) {
         header.records.hassingle = true;
       }
     }
-    if (!header.hassinglerecord) {
-      ref3 = header.variables;
-      for (_ in ref3) {
-        v = ref3[_];
-        v.size = roundup(v.size, 4);
-      }
-    }
     header.records.size = 0;
     header.records.offset = Infinity;
-    ref4 = header.variables;
-    for (_ in ref4) {
-      v = ref4[_];
+    ref3 = header.variables;
+    for (_ in ref3) {
+      v = ref3[_];
       if (!v.isrecord) {
         continue;
       }
       header.records.offset = Math.min(v.offset, header.records.offset);
       header.records.size += v.size;
     }
+    if (!header.hassinglerecord) {
+      header.records.size = roundup(header.records.size, 4);
+    }
     header.records.offsets = {};
-    ref5 = header.variables;
-    for (name in ref5) {
-      v = ref5[name];
+    ref4 = header.variables;
+    for (name in ref4) {
+      v = ref4[name];
       if (!v.isrecord) {
         continue;
       }
@@ -97,25 +93,23 @@ module.exports = function(buffer, callback) {
     return header;
   };
   precompute_size = function(variable, header) {
-    var indexes, j, product, products, ref, results, size, sizes;
+    var indexes, product, products, sizes;
     indexes = variable.dimensions;
     variable.dimensions = {
       indexes: indexes,
+      lengths: [],
       sizes: [],
       products: []
     };
     if (indexes.length === 0) {
       return;
     }
+    variable.dimensions.lengths = indexes.map(function(i) {
+      return header.dimensions[i].length;
+    });
     product = 1;
-    products = (function() {
-      results = [];
-      for (var j = ref = indexes.length - 1; ref <= 0 ? j <= 0 : j >= 0; ref <= 0 ? j++ : j--){ results.push(j); }
-      return results;
-    }).apply(this).map(function(i) {
-      var index;
-      index = indexes[i];
-      product *= header.dimensions[index].length;
+    products = variable.dimensions.lengths.slice(0).reverse().map(function(length) {
+      product *= length;
       return product;
     });
     products = products.reverse();
@@ -130,15 +124,14 @@ module.exports = function(buffer, callback) {
     if (header.dimensions[indexes[0]].length === null) {
       variable.isrecord = true;
       variable.dimensions.indexes.shift();
+      variable.dimensions.lengths.shift();
       variable.dimensions.products.shift();
       variable.dimensions.sizes.shift();
     }
-    size = type.size(variable.type);
-    if (variable.dimensions.indexes.length < 2) {
-      return variable.size = size;
+    variable.size = type.size(variable.type);
+    if (variable.dimensions.indexes.length !== 0) {
+      return variable.size = variable.dimensions.sizes[0];
     }
-    size = variable.dimensions.sizes[0];
-    return variable.size = size;
   };
   magic = function(cb) {
     many.char(3, function(magicstring) {
