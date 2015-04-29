@@ -14,8 +14,7 @@ module.exports = (data) ->
       cb res
   int: (n, cb) ->
     data.read 4 * n, (b) ->
-      res = for i in [0...n]
-        readbinary.int b, 4 * i
+      res = readbinary.int b, 4 * i for i in [0...n]
       cb res
   float: (n, cb) ->
     data.read 4 * n, (b) ->

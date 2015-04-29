@@ -35,15 +35,10 @@ module.exports = function(data) {
     },
     int: function(n, cb) {
       return data.read(4 * n, function(b) {
-        var i, res;
-        res = (function() {
-          var j, ref, results;
-          results = [];
-          for (i = j = 0, ref = n; 0 <= ref ? j < ref : j > ref; i = 0 <= ref ? ++j : --j) {
-            results.push(readbinary.int(b, 4 * i));
-          }
-          return results;
-        })();
+        var i, j, ref, res;
+        for (i = j = 0, ref = n; 0 <= ref ? j < ref : j > ref; i = 0 <= ref ? ++j : --j) {
+          res = readbinary.int(b, 4 * i);
+        }
         return cb(res);
       });
     },
