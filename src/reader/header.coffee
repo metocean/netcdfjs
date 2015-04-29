@@ -1,4 +1,4 @@
-roundup = require './roundup'
+roundup = require '../util/roundup'
 async = require 'odo-async'
 
 marker =
@@ -9,10 +9,10 @@ marker =
   attribute: 12
 
 module.exports = (buffer, callback) ->
-  one = require('./primatives') buffer
-  many = require('./arrays') buffer
-  fill = require('./arraysfill') buffer
-  type = require('./types') buffer
+  one = require('../parsestream/primatives') buffer
+  many = require('../parsestream/arrays') buffer
+  fill = require('../parsestream/arraysfill') buffer
+  type = require('../parsestream/types') buffer
   
   header = (cb) ->
     result = {}

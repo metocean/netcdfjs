@@ -1,6 +1,6 @@
-readfile = require './src/readfile'
-readstream = require './src/readstream'
-readrandom = require './src/readrandom'
+readfile = require './src/fs/readfile'
+readstream = require './src/fs/readstream'
+readrandom = require './src/fs/readrandom'
 netcdf = require './index'
 
 printdelta = (delta) ->

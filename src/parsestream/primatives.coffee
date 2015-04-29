@@ -1,4 +1,4 @@
-binary = require './binary'
+binary = require '../parsearray/binary'
 
 module.exports = (data) ->
   primatives =

@@ -3,7 +3,7 @@ var arraysfill, fill, marker, single, size;
 
 arraysfill = require('./arraysfill');
 
-single = require('./singleprimatives');
+single = require('../parsearray/singleprimatives');
 
 marker = {
   byte: [0, 0, 0, 1],

@@ -1,5 +1,4 @@
 module.exports =
-  header: require './src/header'
-  body: require './src/body2'
-  records: require './src/records'
-  variable: require './src/variable'
+  header: require './src/reader/header'
+  records: require './src/reader/records'
+  variable: require './src/reader/variable'

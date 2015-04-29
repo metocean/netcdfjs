@@ -1,5 +1,5 @@
-binary = require './binary'
-roundup = require './roundup'
+binary = require '../parsearray/binary'
+roundup = require '../util/roundup'
 
 module.exports = (data) ->
   byte: (n, cb) ->

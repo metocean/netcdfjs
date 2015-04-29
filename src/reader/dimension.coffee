@@ -1,4 +1,4 @@
-type = require('./types')()
+type = require('../parsestream/types')()
 
 buildreader = (variable) ->
   fill = variable.attributes._FillValue or type.fill variable.type
