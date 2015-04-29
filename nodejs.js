@@ -13,9 +13,9 @@ printdelta = function(delta) {
   return delta[0] + "s " + (delta[1] / 1000000) + "ms";
 };
 
-start = process.hrtime();
+file = '/Users/tcoats/Desktop/abis20141222_18z_uds.nc';
 
-file = './examples/s20150211_12z.nc';
+start = process.hrtime();
 
 headerbuffer = readstream(file);
 
@@ -25,7 +25,7 @@ netcdf.header(headerbuffer, function(header) {
   headertime = process.hrtime(start);
   start = process.hrtime();
   recordbuffer = readrandom(file);
-  return netcdf.variable(header, recordbuffer, 'freq', function(err, data) {
+  return netcdf.variable(header, recordbuffer, 'lat', function(err, data) {
     var variabletime;
     if (err != null) {
       return console.error(err);

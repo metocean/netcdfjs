@@ -30,7 +30,7 @@ module.exports = function(buffer, callback) {
           result.dimensions = res;
           return gatt_list(function(res) {
             result.attributes = res;
-            return var_list(function(res) {
+            return var_list(result.version.number, function(res) {
               result.variables = res;
               buffer.close();
               return cb(precompute(result));
@@ -270,7 +270,7 @@ module.exports = function(buffer, callback) {
       });
     });
   };
-  var_list = function(cb) {
+  var_list = function(version, cb) {
     return one.int(function(mark) {
       if (mark === marker.zero) {
         return one.int(function() {
@@ -289,7 +289,7 @@ module.exports = function(buffer, callback) {
           return results;
         }).apply(this).map(function() {
           return function(cb) {
-            return variable(function(variable) {
+            return variable(version, function(variable) {
               result[variable.name] = variable.value;
               return cb();
             });
@@ -301,8 +301,9 @@ module.exports = function(buffer, callback) {
       });
     });
   };
-  variable = function(cb) {
+  variable = function(version, cb) {
     return name(function(name) {
+      console.log(name);
       return one.int(function(dimnum) {
         var dimindexes, j, results, tasks;
         dimindexes = [];
@@ -321,7 +322,21 @@ module.exports = function(buffer, callback) {
         return async.series(tasks, function() {
           return vatt_list(function(attributes) {
             return type.type(function(t) {
-              return one.int(function(size) {
+              return one.bigint(function(size) {
+                if (version === 2) {
+                  return one.int(function(offset) {
+                    return cb({
+                      name: name,
+                      value: {
+                        dimensions: dimindexes,
+                        attributes: attributes,
+                        type: t,
+                        size: size,
+                        offset: offset
+                      }
+                    });
+                  });
+                }
                 return one.int(function(offset) {
                   return cb({
                     name: name,

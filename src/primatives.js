@@ -26,6 +26,11 @@ module.exports = function(data) {
         return cb(binary.readInt(b));
       });
     },
+    bigint: function(cb) {
+      return data.read(8, function(b) {
+        return cb(binary.readBigInt(b));
+      });
+    },
     float: function(cb) {
       return data.read(4, function(b) {
         return cb(binary.readFloat(b));

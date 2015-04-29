@@ -24,7 +24,7 @@ module.exports = (buffer, callback) ->
           result.dimensions = res
           gatt_list (res) ->
             result.attributes = res
-            var_list (res) ->
+            var_list result.version.number, (res) ->
               result.variables = res
               buffer.close()
               cb precompute result
@@ -181,7 +181,7 @@ module.exports = (buffer, callback) ->
               value: value
   
   # ABSENT | NC_VARIABLE nelems  [var ...]
-  var_list = (cb) ->
+  var_list = (version, cb) ->
     one.int (mark) ->
       if mark is marker.zero
         return one.int -> cb {}
@@ -192,14 +192,15 @@ module.exports = (buffer, callback) ->
       one.int (count) ->
         result = {}
         tasks = [0...count].map ->
-          (cb) -> variable (variable) ->
+          (cb) -> variable version, (variable) ->
             result[variable.name] = variable.value
             cb()
         async.series tasks, -> cb result
   
   # name  nelems  [dimid ...]  vatt_list  nc_type  vsize  begin
-  variable = (cb) ->
+  variable = (version, cb) ->
     name (name) ->
+      console.log name
       one.int (dimnum) ->
         dimindexes = []
         tasks = [0...dimnum].map ->
@@ -209,15 +210,26 @@ module.exports = (buffer, callback) ->
         async.series tasks, ->
           vatt_list (attributes) ->
             type.type (t) ->
-              one.int (size) ->
+              one.bigint (size) ->
+                if version is 2
+                  return one.int (offset) ->
+                    cb
+                      name: name
+                      value:
+                        dimensions: dimindexes
+                        attributes: attributes
+                        type: t
+                        size: size
+                        offset: offset
+                
                 one.int (offset) ->
-                  cb
-                    name: name
-                    value:
-                      dimensions: dimindexes
-                      attributes: attributes
-                      type: t
-                      size: size
-                      offset: offset
+                    cb
+                      name: name
+                      value:
+                        dimensions: dimindexes
+                        attributes: attributes
+                        type: t
+                        size: size
+                        offset: offset
   
   header (res) -> callback res

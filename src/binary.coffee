@@ -44,6 +44,11 @@ writeFloat = (value, mantSize, expSize) ->
   b.push signBit << expSize | exponent
   b
 
+hex = (b) ->
+  res = b.toString 16
+  res = "0#{res}" if res.length is 1
+  res
+
 module.exports =
   readByte: (b, i) ->
     i = 0 if !i?
@@ -57,6 +62,13 @@ module.exports =
   readInt: (b, i) ->
     i = 0 if !i?
     b[i] << 24 | b[i+1] << 16 | b[i+2] << 8 | b[i+3]
+  readBigInt: (b, i) ->
+    # totally gross
+    i = 0 if !i?
+    res = ''
+    for j in [0...8]
+      res += hex b[i + j]
+    return parseFloat res
   readFloat: (b, i) ->
     i = 0 if !i?
     sign = 1 - 2 * (b[i] >> 7)

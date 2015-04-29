@@ -6,9 +6,9 @@ netcdf = require './index'
 printdelta = (delta) ->
   "#{delta[0]}s #{delta[1]/1000000}ms"
 
-# file = '/Users/tcoats/Desktop/abis20141222_18z_uds.nc'
+file = '/Users/tcoats/Desktop/abis20141222_18z_uds.nc'
 start = process.hrtime()
-file = './examples/s20150211_12z.nc'
+#file = './examples/s20150211_12z.nc'
 headerbuffer = readstream file
 
 netcdf.header headerbuffer, (header) ->
@@ -17,7 +17,7 @@ netcdf.header headerbuffer, (header) ->
   
   start = process.hrtime()
   recordbuffer = readrandom file
-  netcdf.variable header, recordbuffer, 'freq', (err, data) ->
+  netcdf.variable header, recordbuffer, 'lat', (err, data) ->
     return console.error err if err?
     variabletime = process.hrtime start
     console.log data
