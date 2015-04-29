@@ -1,4 +1,4 @@
-type = require './type'
+type = require '../util/type'
 
 buildreader = (variable) ->
   fill = variable.attributes._FillValue or type.fill variable.type

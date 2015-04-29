@@ -1,4 +1,4 @@
-readdimension = require './dimension'
+readdimension = require './readdimension'
 
 module.exports = (header, buffer, variable, cb) ->
   if typeof(variable) is 'string'

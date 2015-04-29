@@ -1,5 +1,5 @@
 roundup = require '../util/roundup'
-type = require './type'
+type = require '../util/type'
 async = require 'odo-async'
 
 marker =
@@ -10,10 +10,10 @@ marker =
   attribute: 12
 
 module.exports = (buffer, callback) ->
-  one = require('../parsestream/readbinary') buffer
-  many = require('../parsestream/readarray') buffer
-  fill = require('../parsestream/readarrayfill') buffer
-  readtype = require('../parsestream/readtype') buffer
+  one = require('../stream/readbinary') buffer
+  many = require('../stream/readarray') buffer
+  fill = require('../stream/readarrayfill') buffer
+  readtype = require('../stream/readtype') buffer
   
   header = (cb) ->
     result = {}

@@ -3,7 +3,7 @@ var async, marker, roundup, type;
 
 roundup = require('../util/roundup');
 
-type = require('./type');
+type = require('../util/type');
 
 async = require('odo-async');
 
@@ -17,10 +17,10 @@ marker = {
 
 module.exports = function(buffer, callback) {
   var att_list, attr, dim, dim_list, fill, gatt_list, header, magic, many, name, numrecs, one, precompute, precompute_size, readtype, var_list, variable, vatt_list;
-  one = require('../parsestream/readbinary')(buffer);
-  many = require('../parsestream/readarray')(buffer);
-  fill = require('../parsestream/readarrayfill')(buffer);
-  readtype = require('../parsestream/readtype')(buffer);
+  one = require('../stream/readbinary')(buffer);
+  many = require('../stream/readarray')(buffer);
+  fill = require('../stream/readarrayfill')(buffer);
+  readtype = require('../stream/readtype')(buffer);
   header = function(cb) {
     var result;
     result = {};

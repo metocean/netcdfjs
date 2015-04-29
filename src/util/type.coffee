@@ -1,4 +1,4 @@
-readbinary = require '../util/readbinary'
+readbinary = require './readbinary'
 
 fill =
   byte: -127

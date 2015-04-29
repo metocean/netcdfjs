@@ -1,4 +1,4 @@
-readdimension = require './dimension'
+readdimension = require './readdimension'
 
 module.exports = (header, buffer, cb) ->
   if header.records.number is 0
