@@ -37,22 +37,29 @@ module.exports = (buffer, callback) ->
     
     precompute_size v, header for _, v of header.variables
     
-    header.hassinglerecord = false
+    header.records.hassingle = false
     for _, v of header.variables
       if v.isrecord
         if header.hassinglerecord
-          header.hassinglerecord = no
+          header.records.hassingle = no
           break
-        header.hassinglerecord = yes
+        header.records.hassingle = yes
     
     unless header.hassinglerecord
       for _, v of header.variables
         v.size = roundup v.size, 4
     
-    header.recordsize = 0
+    header.records.size = 0
+    header.records.offset = Infinity
     for _, v of header.variables
       continue unless v.isrecord
-      header.recordsize += v.size
+      header.records.offset = Math.min v.offset, header.records.offset
+      header.records.size += v.size
+    
+    header.records.offsets = {}
+    for name, v of header.variables
+      continue unless v.isrecord
+      header.records.offsets[name] = v.offset - header.records.offset
     
     header
   
@@ -77,15 +84,18 @@ module.exports = (buffer, callback) ->
     variable.dimensions.sizes = products.map (p) ->
       p * type.size variable.type
     
-    variable.isrecord = header.dimensions[indexes[0]].length is null
+    variable.isrecord = no
+    if header.dimensions[indexes[0]].length is null
+      variable.isrecord = yes
+      # remove record dimension
+      variable.dimensions.indexes.shift()
+      variable.dimensions.products.shift()
+      variable.dimensions.sizes.shift()
     
     size = type.size variable.type
     if variable.dimensions.indexes.length < 2
       return variable.size = size
-    size = if variable.isrecord
-        variable.dimensions.sizes[1]
-      else
-        variable.dimensions.sizes[0]
+    size = variable.dimensions.sizes[0]
     variable.size = size
   
   # 'C'  'D'  'F'  VERSION

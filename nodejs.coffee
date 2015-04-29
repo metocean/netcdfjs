@@ -21,11 +21,12 @@ readstream = require './src/readstream'
 readrandom = require './src/readrandom'
 netcdf = require './index'
 
-file = './examples/s20150211_12z.nc'
-b = readrandom file
+# file = '/Users/tcoats/Desktop/abis20141222_18z_uds.nc'
+file = './examples/WMI_Lear.nc'
+headerbuffer = readstream file
+recordbuffer = readrandom file
 
-start = process.hrtime()
-netcdf.header b, (header) ->
-  delta = process.hrtime start
-  console.log "#{delta[0]}s #{delta[1] / 1000000}ms"
-  #console.log JSON.stringify header, null, 2
+netcdf.header headerbuffer, (header) ->
+  console.log JSON.stringify header, null, 2
+  netcdf.records header, recordbuffer, (err, records) ->
+    console.log Object.keys records

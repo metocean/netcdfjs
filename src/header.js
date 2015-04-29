@@ -41,7 +41,7 @@ module.exports = function(buffer, callback) {
     });
   };
   precompute = function(header) {
-    var _, dim, j, len, ref, ref1, ref2, ref3, ref4, v;
+    var _, dim, j, len, name, ref, ref1, ref2, ref3, ref4, ref5, v;
     ref = header.dimensions;
     for (j = 0, len = ref.length; j < len; j++) {
       dim = ref[j];
@@ -55,16 +55,16 @@ module.exports = function(buffer, callback) {
       v = ref1[_];
       precompute_size(v, header);
     }
-    header.hassinglerecord = false;
+    header.records.hassingle = false;
     ref2 = header.variables;
     for (_ in ref2) {
       v = ref2[_];
       if (v.isrecord) {
         if (header.hassinglerecord) {
-          header.hassinglerecord = false;
+          header.records.hassingle = false;
           break;
         }
-        header.hassinglerecord = true;
+        header.records.hassingle = true;
       }
     }
     if (!header.hassinglerecord) {
@@ -74,14 +74,25 @@ module.exports = function(buffer, callback) {
         v.size = roundup(v.size, 4);
       }
     }
-    header.recordsize = 0;
+    header.records.size = 0;
+    header.records.offset = Infinity;
     ref4 = header.variables;
     for (_ in ref4) {
       v = ref4[_];
       if (!v.isrecord) {
         continue;
       }
-      header.recordsize += v.size;
+      header.records.offset = Math.min(v.offset, header.records.offset);
+      header.records.size += v.size;
+    }
+    header.records.offsets = {};
+    ref5 = header.variables;
+    for (name in ref5) {
+      v = ref5[name];
+      if (!v.isrecord) {
+        continue;
+      }
+      header.records.offsets[name] = v.offset - header.records.offset;
     }
     return header;
   };
@@ -115,12 +126,18 @@ module.exports = function(buffer, callback) {
     variable.dimensions.sizes = products.map(function(p) {
       return p * type.size(variable.type);
     });
-    variable.isrecord = header.dimensions[indexes[0]].length === null;
+    variable.isrecord = false;
+    if (header.dimensions[indexes[0]].length === null) {
+      variable.isrecord = true;
+      variable.dimensions.indexes.shift();
+      variable.dimensions.products.shift();
+      variable.dimensions.sizes.shift();
+    }
     size = type.size(variable.type);
     if (variable.dimensions.indexes.length < 2) {
       return variable.size = size;
     }
-    size = variable.isrecord ? variable.dimensions.sizes[1] : variable.dimensions.sizes[0];
+    size = variable.dimensions.sizes[0];
     return variable.size = size;
   };
   magic = function(cb) {

@@ -1,4 +1,5 @@
 arraysfill = require './arraysfill'
+single = require './singleprimatives'
 
 marker =
   byte: [0, 0, 0, 1]
@@ -46,6 +47,15 @@ module.exports = (data) ->
           b.map (v) ->
             return null if v is fill
             v
+    singleReader: (type, fill) ->
+      if !single[type]?
+        throw new Error "A reader for #{type} not found"
+      f = single[type]
+      return f if !fill? or type is 'char'
+      (b, i) ->
+        result = f b, i
+        return null if result is fill
+        result
     fill: (type) ->
       return fill[type] if fill[type]?
       throw new Error "No fill found for #{type}"
