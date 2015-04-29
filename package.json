@@ -6,9 +6,6 @@
     "type": "git",
     "url": "git@github.com:metocean/netcdfjs.git"
   },
-  "scripts": {
-    "test": "mocha test/*.js --reporter spec"
-  },
   "bin": {
     "ncjsdump": "bin/ncjsdump.js"
   },
@@ -25,9 +22,5 @@
     "odo-async": "^1.0.0",
     "text-encoding": "^0.5.2",
     "typedarray": "0.0.6"
-  },
-  "devDependencies": {
-    "chai": "1.*",
-    "mocha": "2.*"
   }
 }
