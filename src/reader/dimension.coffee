@@ -1,8 +1,8 @@
-type = require('../parsestream/types')()
+type = require './type'
 
 buildreader = (variable) ->
   fill = variable.attributes._FillValue or type.fill variable.type
-  type.singleReader variable.type, fill
+  type.reader variable.type, fill
 
 module.exports = (content, position, variable) ->
   reader = buildreader variable

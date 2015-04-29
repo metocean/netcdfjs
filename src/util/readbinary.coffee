@@ -5,71 +5,32 @@ decoder = new require('text-encoding').TextDecoder 'utf-8'
 pow2 = (n) ->
   if n >= 0 and n < 31 then 1 << n else pow2[n] or (pow2[n] = 2 ** n)
 
-writeFloat = (value, mantSize, expSize) ->
-  signBit = if value < 0 then 1 else 0
-  exponent = undefined
-  mantissa = undefined
-  eMax = ~(-1 << expSize - 1)
-  eMin = 1 - eMax
-  if value < 0
-    value = -value
-  if value == 0
-    exponent = 0
-    mantissa = 0
-  else if isNaN(value)
-    exponent = 2 * eMax + 1
-    mantissa = 1
-  else if value == Infinity
-    exponent = 2 * eMax + 1
-    mantissa = 0
-  else
-    exponent = Math.floor(Math.log(value) / Math.LN2)
-    if exponent >= eMin and exponent <= eMax
-      mantissa = Math.floor((value * pow2(-exponent) - 1) * pow2(mantSize))
-      exponent += eMax
-    else
-      mantissa = Math.floor(value / pow2(eMin - mantSize))
-      exponent = 0
-  b = []
-  while mantSize >= 8
-    b.push mantissa % 256
-    mantissa = Math.floor(mantissa / 256)
-    mantSize -= 8
-  exponent = exponent << mantSize | mantissa
-  expSize += mantSize
-  while expSize >= 8
-    b.push exponent & 0xff
-    exponent >>>= 8
-    expSize -= 8
-  b.push signBit << expSize | exponent
-  b
-
 hex = (b) ->
   res = b.toString 16
   res = "0#{res}" if res.length is 1
   res
 
 module.exports =
-  readByte: (b, i) ->
+  byte: (b, i) ->
     i = 0 if !i?
     b[i]
-  readChar: (b, i) ->
+  char: (b, i) ->
     i = 0 if !i?
     String.fromCharCode b[i]
-  readShort: (b, i) ->
+  short: (b, i) ->
     i = 0 if !i?
     b[i] << 8 | b[i+1]
-  readInt: (b, i) ->
+  int: (b, i) ->
     i = 0 if !i?
     b[i] << 24 | b[i+1] << 16 | b[i+2] << 8 | b[i+3]
-  readBigInt: (b, i) ->
+  bigint: (b, i) ->
     # totally gross
     i = 0 if !i?
     res = ''
     for j in [0...8]
       res += hex b[i + j]
     return parseFloat res
-  readFloat: (b, i) ->
+  float: (b, i) ->
     i = 0 if !i?
     sign = 1 - 2 * (b[i] >> 7)
     exponent = (b[i] << 1 & 0xff | b[i+1] >> 7) - 127
@@ -82,7 +43,7 @@ module.exports =
     if exponent is -127
       return sign * mantissa * pow2(-126 - 23)
     sign * (1 + mantissa * pow2(-23)) * pow2(exponent)
-  readDouble: (b, i) ->
+  double: (b, i) ->
     i = 0 if !i?
     sign = 1 - 2 * (b[i] >> 7)
     exponent = ((b[i] << 1 & 0xff) << 3 | b[i+1] >> 4) - ((1 << 10) - 1)
@@ -95,7 +56,5 @@ module.exports =
     if exponent is -1023
       return sign * mantissa * pow2(-1022 - 52)
     sign * (1 + mantissa * pow2(-52)) * pow2(exponent)
-  readString: (b) ->
+  string: (b) ->
     decoder.decode b
-  writeFloat: (value) -> writeFloat value, 23, 8
-  writeDouble: (value) -> writeFloat value, 52, 11

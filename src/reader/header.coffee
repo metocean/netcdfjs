@@ -1,4 +1,5 @@
 roundup = require '../util/roundup'
+type = require './type'
 async = require 'odo-async'
 
 marker =
@@ -9,10 +10,10 @@ marker =
   attribute: 12
 
 module.exports = (buffer, callback) ->
-  one = require('../parsestream/primatives') buffer
-  many = require('../parsestream/arrays') buffer
-  fill = require('../parsestream/arraysfill') buffer
-  type = require('../parsestream/types') buffer
+  one = require('../parsestream/readbinary') buffer
+  many = require('../parsestream/readarray') buffer
+  fill = require('../parsestream/readarrayfill') buffer
+  readtype = require('../parsestream/readtype') buffer
   
   header = (cb) ->
     result = {}
@@ -173,9 +174,9 @@ module.exports = (buffer, callback) ->
   # name  nc_type  nelems  [values ...]
   attr = (cb) ->
     name (name) ->
-      type.type (t) ->
+      readtype.type (t) ->
         one.int (count) ->
-          type.reader(t) count, (value) ->
+          readtype.reader(t) count, (value) ->
             cb
               name: name
               value: value
@@ -209,7 +210,7 @@ module.exports = (buffer, callback) ->
             cb()
         async.series tasks, ->
           vatt_list (attributes) ->
-            type.type (t) ->
+            readtype.type (t) ->
               one.bigint (size) ->
                 if version is 2
                   return one.int (offset) ->
