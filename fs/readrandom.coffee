@@ -1,3 +1,7 @@
+# Read random parts of the file.
+# Use this for record and variable reading off a file.
+# Can be used for reading header however readstream is recommended.
+
 fs = require 'fs'
 
 module.exports = (file) ->

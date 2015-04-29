@@ -1,3 +1,5 @@
+# Read a primitive type from a stream.
+
 readbinary = require '../util/readbinary'
 
 module.exports = (data) ->

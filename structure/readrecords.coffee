@@ -1,3 +1,5 @@
+# Read all the variables that are part of the record dimension.
+
 readdimension = require './readdimension'
 
 module.exports = (header, buffer, cb) ->

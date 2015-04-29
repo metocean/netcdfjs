@@ -1,3 +1,7 @@
+# Read n of a type from a stream interface.
+# Does not round bytes read to the nearest 4 byte offset.
+# Only used to read the magic string.
+
 readbinary = require '../util/readbinary'
 
 module.exports = (data) ->

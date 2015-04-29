@@ -1,3 +1,6 @@
+# Can only be used for reading header.
+# Closes the stream once the header is read.
+
 fs = require 'fs'
 
 module.exports = (file) ->

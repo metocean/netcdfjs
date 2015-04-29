@@ -1,3 +1,6 @@
+# Read the whole file at once and use readbuffer for access.
+# Use this if the file is small or you know you need all of the data.
+
 fs = require 'fs'
 readbuffer = require './readbuffer'
 

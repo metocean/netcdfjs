@@ -1,3 +1,6 @@
+# Read all the header information from a NetCDF file.
+# Pre-computes variable dimension sizes and record sizes and offsets
+
 roundup = require '../util/roundup'
 type = require '../util/type'
 async = require 'odo-async'

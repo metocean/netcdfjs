@@ -1,3 +1,7 @@
+# Use this function to read from an array or buffer.
+# This should be used in browser as well.
+# 'new Uint8Array' may need polyfix through typed-array
+
 module.exports = (buffer) ->
   index = 0
   length = buffer

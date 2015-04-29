@@ -1,6 +1,8 @@
+# Read binary forms from byte arrays.
+# float and double methods have been extracted from https://github.com/jDataView/jDataView/blob/master/src/jdataview.js
+
 decoder = new require('text-encoding').TextDecoder 'utf-8'
 
-# Extracted from https://github.com/jDataView/jDataView/blob/master/src/jdataview.js
 
 pow2 = (n) ->
   if n >= 0 and n < 31 then 1 << n else pow2[n] or (pow2[n] = 2 ** n)
@@ -24,7 +26,7 @@ module.exports =
     i = 0 if !i?
     b[i] << 24 | b[i+1] << 16 | b[i+2] << 8 | b[i+3]
   bigint: (b, i) ->
-    # totally gross
+    # totally gross, need better int64 support
     i = 0 if !i?
     res = ''
     for j in [0...8]

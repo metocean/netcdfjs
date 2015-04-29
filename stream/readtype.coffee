@@ -1,4 +1,8 @@
-arraysfill = require './readarrayfill'
+# Read a type marker from a stream.
+# Generate an array reader from a type literal.
+# Used to read attributes.
+
+readarrayfill = require './readarrayfill'
 
 marker =
   byte: [0, 0, 0, 1]
@@ -9,7 +13,7 @@ marker =
   double: [0, 0, 0, 6]
 
 module.exports = (data) ->
-  many = arraysfill data
+  many = readarrayfill data
   type: (cb) ->
     data.read 4, (b) ->
       match = (marker) ->

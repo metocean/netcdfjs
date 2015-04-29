@@ -1,3 +1,7 @@
+# Read n of a type from a stream interface.
+# Rounds bytes read to the nearest 4 byte offset.
+# Used in header parsing.
+
 readbinary = require '../util/readbinary'
 roundup = require '../util/roundup'
 

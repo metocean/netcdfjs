@@ -1,3 +1,8 @@
+# Read a dimensional variable into it's multi-dimensional array.
+# Has edge case for no dimensions.
+# Used by both readvariable and readrecords.
+# Uses pre-computed values from 'precompute_size' in header.
+
 type = require '../util/type'
 
 buildreader = (variable) ->

@@ -1,6 +1,9 @@
-decoder = new require('text-encoding').TextDecoder 'utf-8'
+# Write binary forms from byte arrays.
+# Not used yet.
+# float and double methods extracted from https://github.com/jDataView/jDataView/blob/master/src/jdataview.js
+# Needs a destination buffer and offset
 
-# Extracted from https://github.com/jDataView/jDataView/blob/master/src/jdataview.js
+decoder = new require('text-encoding').TextDecoder 'utf-8'
 
 pow2 = (n) ->
   if n >= 0 and n < 31 then 1 << n else pow2[n] or (pow2[n] = 2 ** n)
