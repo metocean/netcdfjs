@@ -1,0 +1,26 @@
+{
+  "name": "netcdf-tests",
+  "version": "0.2.0",
+  "description": "Tests for netcdfjs",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:metocean/netcdfjs-tests.git"
+  },
+  "scripts": {
+    "test": "mocha test/*.js --reporter spec"
+  },
+  "author": "Thomas Coats",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/metocean/netcdfjs-tests/issues"
+  },
+  "readmeFilename": "README.md",
+  "homepage": "https://github.com/metocean/netcdfjs-tests",
+  "dependencies": {
+    "netcdf": "^1.1.0"
+  },
+  "devDependencies": {
+    "chai": "^1.10.0",
+    "mocha": "^2.2.4"
+  }
+}
