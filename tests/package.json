@@ -17,7 +17,7 @@
   "readmeFilename": "README.md",
   "homepage": "https://github.com/metocean/netcdfjs-tests",
   "dependencies": {
-    "netcdf": "^1.1.0"
+    "netcdf": "^1.1.1"
   },
   "devDependencies": {
     "chai": "^1.10.0",
