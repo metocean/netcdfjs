@@ -1,7 +1,7 @@
 # Read binary forms from byte arrays.
 # float and double methods have been extracted from https://github.com/jDataView/jDataView/blob/master/src/jdataview.js
 
-decoder = new require('text-encoding').TextDecoder 'utf-8'
+decoder = new textEncoding.TextDecoder 'utf-8'
 
 
 pow2 = (n) ->

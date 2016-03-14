@@ -1,10 +1,10 @@
 {
-  "name": "netcdf",
-  "version": "1.1.1",
+  "name": "rps-netcdf",
+  "version": "1.1.26",
   "description": "Read NetCDF files in the browser or with Node.js",
   "repository": {
     "type": "git",
-    "url": "git@github.com:metocean/netcdfjs.git"
+    "url": "git@github.com:FBRTMaka/netcdfjs.git"
   },
   "bin": {
     "ncjsdump": "bin/ncjsdump.js"
@@ -17,10 +17,10 @@
   },
   "readmeFilename": "README.md",
   "homepage": "https://github.com/metocean/netcdfjs",
-  "bundledDependencies": {
-    "chalk": "^1.1.1",
-    "odo-async": "^1.0.2",
-    "text-encoding": "^0.5.5",
-    "typedarray": "0.0.6"
+  "dependencies": {
+      "chalk": "^1.1.1",
+      "odo-async": "^1.0.2",
+      "text-encoding": "^0.5.5",
+      "typedarray": "0.0.6"
   }
 }
