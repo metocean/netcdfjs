@@ -17,10 +17,10 @@
   },
   "readmeFilename": "README.md",
   "homepage": "https://github.com/metocean/netcdfjs",
-  "dependencies": {
-    "chalk": "^1.0.0",
-    "odo-async": "^1.0.0",
-    "text-encoding": "^0.5.2",
+  "bundledDependencies": {
+    "chalk": "^1.1.1",
+    "odo-async": "^1.0.2",
+    "text-encoding": "^0.5.5",
     "typedarray": "0.0.6"
   }
 }
