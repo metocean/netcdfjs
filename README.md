@@ -1,6 +1,8 @@
 # NetCDF
 Read NetCDF files in the browser or with Node.js
 
+**Not finished but a great start for anyone wanting to contribute**
+
 ## Supported
 - NetCDF Classic Format
 - Reading only at this stage
