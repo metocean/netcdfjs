@@ -19,9 +19,9 @@ Read NetCDF files in the browser or with Node.js
 ## Example
 
 ```js
-var readstream = require('netcdf/fs/readstream');
-var readrandom = require('netcdf/fs/readrandom');
-var netcdf = require('netcdf');
+var readstream = require('rps-netcdf/fs/readstream');
+var readrandom = require('rps-netcdf/fs/readrandom');
+var netcdf = require('rps-netcdf');
 
 var file = './examples/WMI_Lear.nc';
 var headerbuffer = readstream(file);
