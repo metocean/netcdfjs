@@ -1,10 +1,10 @@
 {
   "name": "rps-netcdf",
-  "version": "1.1.26",
+  "version": "0.0.42",
   "description": "Read NetCDF files in the browser or with Node.js",
   "repository": {
     "type": "git",
-    "url": "git@github.com:FBRTMaka/netcdfjs.git"
+    "url": "git@github.com:maka-io/netcdfjs.git"
   },
   "bin": {
     "ncjsdump": "bin/ncjsdump.js"
@@ -13,14 +13,14 @@
   "author": "Thomas Coats",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/metocean/netcdfjs/issues"
+    "url": "https://github.com/maka-io/netcdfjs/issues"
   },
   "readmeFilename": "README.md",
-  "homepage": "https://github.com/metocean/netcdfjs",
+  "homepage": "https://github.com/maka-io/netcdfjs",
   "dependencies": {
       "chalk": "^1.1.1",
       "odo-async": "^1.0.2",
-      "text-encoding": "^0.5.5",
-      "typedarray": "0.0.6"
+      "text-encoding": "^0.6.0",
+      "typedarray": "^0.0.6"
   }
 }
