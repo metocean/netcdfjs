@@ -8,10 +8,10 @@ usage = """
 Usage: #{chalk.cyan 'ncjsdump'} <netcdf file> [<variable>]
 
    The default action is to print the NetCDF header
-   
+
    When passed a variable name the variable's details
    and data will be printed
-   
+
 """
 
 if args.length is 0 or args.length > 2
@@ -20,11 +20,11 @@ if args.length is 0 or args.length > 2
 
 file = args[0]
 
-readstream = require '../src/readstream'
+readstream = require '../fs/readstream'
 netcdf = require '../'
 
 buffer = readstream file
-netcdf.header buffer, (header) ->
+netcdf.readheader buffer, (header) ->
   if args.length is 1
     console.log JSON.stringify header, null, 2
     process.exit 0
