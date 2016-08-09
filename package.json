@@ -1,6 +1,6 @@
 {
   "name": "netcdf",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Read NetCDF files in the browser or with Node.js",
   "repository": {
     "type": "git",
@@ -18,9 +18,9 @@
   "readmeFilename": "README.md",
   "homepage": "https://github.com/metocean/netcdfjs",
   "dependencies": {
-    "chalk": "^1.0.0",
-    "odo-async": "^1.0.0",
-    "text-encoding": "^0.5.2",
+    "chalk": "^1.1.1",
+    "odo-async": "^1.0.2",
+    "text-encoding": "^0.6.0",
     "typedarray": "0.0.6"
   }
 }
